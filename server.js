@@ -10,15 +10,19 @@ const app = express();
 app.use(cors());
 
 // --- ARAMA URL ŞABLONLARI ---
-// (YENİ EKLENEN KISIM: Sitelerin arama motorlarına "Açıklama, Marka ve Stok Kodunda da ara" talimatı eklendi)
+// DİKKAT: Sitelerin kendi arama motorlarını Stok Kodu, Marka ve Açıklama aramaya zorlayan "Gizli Parametreler" eklendi!
 const URL_FORMAT = {
-    IDEASOFT: (url, k) => `${url}/arama/${encodeURIComponent(k).replace(/%20/g, '+')}?search_in_description=1`,
-    TICIMAX: (url, k) => `${url}/?k=${encodeURIComponent(k)}&searchInDesc=1`,
+    // Ideasoft altyapısı için Stok kodu, açıklama ve alt kategori arama komutları
+    IDEASOFT: (url, k) => `${url}/arama/${encodeURIComponent(k).replace(/%20/g, '+')}?search_in_description=1&search_in_stock_code=1&search_in_brand=1`,
+    
+    // Ticimax altyapısı için Stok kodu ve detay arama komutları
+    TICIMAX: (url, k) => `${url}/?k=${encodeURIComponent(k)}&searchInDesc=1&searchInStockCode=1`,
+    
+    // Shopify zaten otomatik olarak hepsini arar
     SHOPIFY: (url, k) => `${url}/search?q=${encodeURIComponent(k)}`
 };
 
-// --- CSS SEÇİCİ ŞABLONLARI ---
-// (SENİN ORİJİNAL, SORUNSUZ ÇALIŞAN SEÇİCİLERİN - HİÇ DEĞİŞTİRİLMEDİ)
+// --- CSS SEÇİCİ ŞABLONLARI (ORİJİNAL - DOKUNULMADI) ---
 const CSS_FORMAT = {
     IDEASOFT: { 
         kutu: '.showcase, .product-item, .box-product', 
@@ -40,7 +44,7 @@ const CSS_FORMAT = {
     }
 };
 
-// --- BAŞARIYLA ÇÖZÜLEN 17 MAĞAZA ---
+// --- BAŞARIYLA ÇÖZÜLEN 17 MAĞAZA (ORİJİNAL - DOKUNULMADI) ---
 const HEDEFLER =[
     { magaza_adi: "Kamu Solar", url: "https://www.kamusolar.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.kamusolar.com", k), seciciler: CSS_FORMAT.IDEASOFT },
     { magaza_adi: "Global Enerji", url: "https://www.globalenerjimarketim.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.globalenerjimarketim.com", k), seciciler: CSS_FORMAT.IDEASOFT },
@@ -66,7 +70,7 @@ app.get('/ara', async (req, res) => {
     if (!kelime) return res.status(400).json({ error: "Kelime girin." });
 
     console.log(`\n===========================================`);
-    console.log(`"${kelime}" için ARAMA BAŞLADI (Açıklama/Marka Taramalı)`);
+    console.log(`"${kelime}" için ARAMA BAŞLADI (Stok Kodu/Marka Zorlamalı)`);
     console.log(`===========================================`);
 
     const headers = { 
@@ -82,7 +86,7 @@ app.get('/ara', async (req, res) => {
 
             let sonuclar =[];
             
-            // (SENİN ORİJİNAL, SORUNSUZ HTML OKUMA KODUN)
+            // (ORİJİNAL SORUNSUZ HTML ÇEKME KODUN - Fiyat Çekme Bozulmasın Diye Eski Halinde Bırakıldı)
             $(site.seciciler.kutu).each((i, el) => {
                 let urunAdi = $(el).find(site.seciciler.ad).text().replace(/\s+/g, ' ').trim();
                 let fiyat = $(el).find(site.seciciler.fiyat).text().replace(/\s+/g, ' ').trim();
@@ -105,7 +109,7 @@ app.get('/ara', async (req, res) => {
         }
     });
 
-    // (ORİJİNAL GOOGLE SERPAPI KODUN - EKSİLTİLMEDİ)
+    // (ORİJİNAL GOOGLE SERPAPI KODUN)
     const pSerpApi = (async () => {
         try {
             const SERP_API_KEY = "86cf4c5c700b1b64a24f3b8c68f85f28680ec466dd837d1c56cc8035cbb533dc";
