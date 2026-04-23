@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Solar Market Arama</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        input { padding: 10px; width: 300px; }
+        button { padding: 10px; cursor: pointer; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+
+    <h2>Tüm Marketlerde Ara</h2>
+    <input type="text" id="aramaKutusu" placeholder="Örn: Güneş Paneli">
+    <button onclick="ara()">Ara</button>
+
+    <div id="loading" style="display:none; margin-top:10px;">Aranıyor, bekle...</div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Mağaza</th>
+                <th>Ürün Adı</th>
+                <th>Fiyat</th>
+                <th>Link</th>
+            </tr>
+        </thead>
+        <tbody id="sonucTablosu">
+            </tbody>
+    </table>
+
+    <script>
+        async function ara() {
+            const kelime = document.getElementById('aramaKutusu').value;
+            if(!kelime) return alert("Kelime gir!");
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('sonucTablosu').innerHTML = '';
+
+            try {
+                const response = await fetch(`/ara?q=${encodeURIComponent(kelime)}`);
+                const veriler = await response.json();
+
+                let html = '';
+                veriler.forEach(urun => {
+                    html += `<tr>
+                        <td>${urun.magaza}</td>
+                        <td>${urun.urunAdi}</td>
+                        <td>${urun.fiyat}</td>
+                        <td><a href="${urun.link}" target="_blank">Git</a></td>
+                    </tr>`;
+                });
+
+                document.getElementById('sonucTablosu').innerHTML = html;
+            } catch (error) {
+                alert("Sunucuya bağlanılamadı. Node.js sunucusunun açık olduğundan emin ol.");
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
