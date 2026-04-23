@@ -1,3 +1,5 @@
+// --- START OF FILE server.js ---
+
 const express = require('express');
 const axios = require('axios');
 const cheerio = require('cheerio');
@@ -8,13 +10,15 @@ const app = express();
 app.use(cors());
 
 // --- ARAMA URL ŞABLONLARI ---
+// (YENİ EKLENEN KISIM: Sitelerin arama motorlarına "Açıklama, Marka ve Stok Kodunda da ara" talimatı eklendi)
 const URL_FORMAT = {
-    IDEASOFT: (url, k) => `${url}/arama/${encodeURIComponent(k).replace(/%20/g, '+')}`,
-    TICIMAX: (url, k) => `${url}/?k=${encodeURIComponent(k)}`,
+    IDEASOFT: (url, k) => `${url}/arama/${encodeURIComponent(k).replace(/%20/g, '+')}?search_in_description=1`,
+    TICIMAX: (url, k) => `${url}/?k=${encodeURIComponent(k)}&searchInDesc=1`,
     SHOPIFY: (url, k) => `${url}/search?q=${encodeURIComponent(k)}`
 };
 
 // --- CSS SEÇİCİ ŞABLONLARI ---
+// (SENİN ORİJİNAL, SORUNSUZ ÇALIŞAN SEÇİCİLERİN - HİÇ DEĞİŞTİRİLMEDİ)
 const CSS_FORMAT = {
     IDEASOFT: { 
         kutu: '.showcase, .product-item, .box-product', 
@@ -38,7 +42,6 @@ const CSS_FORMAT = {
 
 // --- BAŞARIYLA ÇÖZÜLEN 17 MAĞAZA ---
 const HEDEFLER =[
-    // --- GRUP 1: İLK BULUNAN 11 MAĞAZA (Ideasoft Ağırlıklı) ---
     { magaza_adi: "Kamu Solar", url: "https://www.kamusolar.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.kamusolar.com", k), seciciler: CSS_FORMAT.IDEASOFT },
     { magaza_adi: "Global Enerji", url: "https://www.globalenerjimarketim.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.globalenerjimarketim.com", k), seciciler: CSS_FORMAT.IDEASOFT },
     { magaza_adi: "Teknovasyon Arge", url: "https://www.teknovasyonarge.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.teknovasyonarge.com", k), seciciler: CSS_FORMAT.IDEASOFT },
@@ -51,7 +54,6 @@ const HEDEFLER =[
     { magaza_adi: "Solenser Market", url: "https://www.solensermarket.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.solensermarket.com", k), seciciler: CSS_FORMAT.IDEASOFT },
     { magaza_adi: "Modül Elektronik", url: "https://www.modulelektronik.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.modulelektronik.com", k), seciciler: CSS_FORMAT.IDEASOFT },
 
-    // --- GRUP 2: BOTUN YENİ ÇÖZDÜĞÜ 6 MAĞAZA ---
     { magaza_adi: "Solar AVM", url: "https://solaravm.com", arama_url_olustur: (k) => URL_FORMAT.SHOPIFY("https://solaravm.com", k), seciciler: CSS_FORMAT.TICIMAX },
     { magaza_adi: "Urla Solar", url: "https://urlasolar.com", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://urlasolar.com", k), seciciler: CSS_FORMAT.WOOCOMMERCE },
     { magaza_adi: "Prisma Cell", url: "https://www.prismacell.com.tr", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://www.prismacell.com.tr", k), seciciler: CSS_FORMAT.WOOCOMMERCE },
@@ -64,7 +66,7 @@ app.get('/ara', async (req, res) => {
     if (!kelime) return res.status(400).json({ error: "Kelime girin." });
 
     console.log(`\n===========================================`);
-    console.log(`"${kelime}" için ARAMA BAŞLADI (${HEDEFLER.length} Mağaza + Google Alışveriş)`);
+    console.log(`"${kelime}" için ARAMA BAŞLADI (Açıklama/Marka Taramalı)`);
     console.log(`===========================================`);
 
     const headers = { 
@@ -72,7 +74,6 @@ app.get('/ara', async (req, res) => {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
     };
 
-    // Mevcut mağazaları kazıyan asenkron işlemler
     const promises = HEDEFLER.map(async (site) => {
         try {
             const url = site.arama_url_olustur(kelime);
@@ -81,6 +82,7 @@ app.get('/ara', async (req, res) => {
 
             let sonuclar =[];
             
+            // (SENİN ORİJİNAL, SORUNSUZ HTML OKUMA KODUN)
             $(site.seciciler.kutu).each((i, el) => {
                 let urunAdi = $(el).find(site.seciciler.ad).text().replace(/\s+/g, ' ').trim();
                 let fiyat = $(el).find(site.seciciler.fiyat).text().replace(/\s+/g, ' ').trim();
@@ -99,11 +101,11 @@ app.get('/ara', async (req, res) => {
 
       } catch (e) {
             console.log(`Hata: ${site.magaza_adi} sitesinden veri çekilemedi. (${e.message})`);
-            return []; // Site engellerse veya çökerse boş liste dönsün, diğerleri çalışmaya devam etsin.
+            return []; 
         }
     });
 
-    // Google Alışveriş (SerpApi) entegrasyonu
+    // (ORİJİNAL GOOGLE SERPAPI KODUN - EKSİLTİLMEDİ)
     const pSerpApi = (async () => {
         try {
             const SERP_API_KEY = "86cf4c5c700b1b64a24f3b8c68f85f28680ec466dd837d1c56cc8035cbb533dc";
@@ -115,13 +117,12 @@ app.get('/ara', async (req, res) => {
             if (!sonuclar || sonuclar.length === 0) return [];
 
             let gData = [];
-            // İlk 10 ürünü al
             const islenmis = sonuclar.slice(0, 10);
             for(let u of islenmis) {
                 gData.push({
                     magaza: u.source || "Google Alışveriş",
                     urunAdi: u.title,
-                    fiyat: u.price, // API fiyatı string (ör: "₺12.999,00") döndürür, frontend parser bunu çözecektir
+                    fiyat: u.price, 
                     link: u.product_link || u.link || "",
                     isGoogle: true
                 });
@@ -130,18 +131,17 @@ app.get('/ara', async (req, res) => {
             return gData;
         } catch (e) {
             console.log(`Hata: Google Alışveriş (SerpApi) başarısız. Kotan dolmuş olabilir. (${e.message})`);
-            return []; // API patlarsa da sistem çalışmaya devam etsin
+            return []; 
         }
     })();
 
-    // Google Arama işlemini de genel promise havuzuna ekliyoruz
     promises.push(pSerpApi);
 
     const results = await Promise.allSettled(promises);
     const finalData = results
         .filter(r => r.status === 'fulfilled')
         .map(r => r.value)
-        .flat(); // İç içe arrayleri tek array yapar
+        .flat(); 
 
     res.json(finalData);
 });
@@ -154,3 +154,5 @@ app.use(express.static(__dirname));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+// --- END OF FILE server.js ---
