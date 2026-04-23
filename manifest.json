@@ -1,0 +1,21 @@
+{
+  "name": "Kamu Solar Güncel Fiyatlar",
+  "short_name": "Kamu Solar",
+  "description": "ZEN Prod. 2026",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0f1a",
+  "theme_color": "#00f0ff",
+  "icons": [
+    {
+      "src": "https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

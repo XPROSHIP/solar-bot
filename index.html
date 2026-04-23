@@ -2,9 +2,18 @@
 <html lang="tr">
     <head>
         <meta charset="UTF-8">
+
+<!-- PWA Manifest ve İkon Ayarları -->
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#0a0f1a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<link rel="apple-touch-icon" href="https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png">
+
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
         <title>Kamu Solar | Güncel Fiyat Listesi by ZEN©2026</title>
-        
+        <link rel="icon" type="image/png" href="https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png">
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Kite+One&family=Inter:wght@300;400;600;700;900&display=swap" rel="stylesheet">
@@ -537,7 +546,7 @@
                 document.getElementById('selectAll').checked = false;
 
                 try {
-                    const response = await fetch(`http://localhost:3000/ara?q=${encodeURIComponent(query)}`);
+                    const response = await fetch(`/ara?q=${encodeURIComponent(query)}`);
                     let veriler = await response.json();
                     
                     // 1. AŞAMA: Temel Parse İşlemi (Google bayrağı eklendi)
@@ -935,5 +944,17 @@
                 }
             }
         </script>
+
+<!-- Service Worker Kaydı -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('PWA Kurulumu Hazır!'))
+                .catch(err => console.log('PWA Hatası:', err));
+        });
+    }
+</script>
+
     </body>
 </html>
