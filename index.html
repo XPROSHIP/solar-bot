@@ -1,4 +1,3 @@
-<!-- START OF FILE index v4.html (FULL HYBRID VERSION) -->
 <!DOCTYPE html>
 <html lang="tr">
     <head>
@@ -24,6 +23,7 @@
         
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
         <script>
+            // jsPDF ve AutoTable Uyum Sorunu Çözümü
             window.jsPDF = window.jspdf.jsPDF; 
         </script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
@@ -45,7 +45,7 @@
                 --danger: #ef4444;
                 --warning: #f59e0b;
                 --info: #8b5cf6;
-                --google: #fbbc05;
+                --google: #fbbc05; /* Google Turuncu/Sarı rengi */
                 --border-solid: #1e293b;
                 --border: rgba(0, 240, 255, 0.2);
                 --glow-primary: 0 0 15px rgba(0, 240, 255, 0.4);
@@ -53,26 +53,41 @@
                 --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             }
 
-            * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; margin: 0; padding: 0; }
+            * {
+                box-sizing: border-box;
+                -webkit-tap-highlight-color: transparent;
+                margin: 0;
+                padding: 0;
+            }
 
+            /* Sağ Tık Engeli & Metin Seçimi Yönetimi */
             html, body {
-                height: 100%; width: 100%; overflow: hidden;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
                 font-family: 'Inter', sans-serif;
                 background-color: var(--bg-base);
                 background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px);
                 background-size: 30px 30px;
-                color: var(--text-main); display: flex; justify-content: center; user-select: none;
+                color: var(--text-main);
+                display: flex;
+                justify-content: center;
+                user-select: none;
             }
             input, textarea, .selectable { user-select: auto; }
 
+            /* Custom Scrollbar */
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: var(--bg-base); }
             ::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 10px; }
             ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
             .app-wrapper {
-                width: 100%; max-width: 1200px; height: 100%;
-                display: flex; flex-direction: column;
+                width: 100%;
+                max-width: 1200px;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
                 background-color: rgba(10, 15, 26, 0.95);
                 backdrop-filter: blur(10px);
                 box-shadow: 0 0 50px rgba(0,0,0,1);
@@ -84,179 +99,301 @@
             .font-bangers { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
             .font-kite { font-family: 'Kite One', sans-serif; }
 
+            /* HEADER */
             .header {
-                padding: 15px 20px; display: flex; align-items: center; gap: 15px;
-                background: rgba(18, 26, 40, 0.95); backdrop-filter: blur(15px);
-                border-bottom: 1px solid var(--border-solid); z-index: 100; flex-shrink: 0;
+                padding: 15px 20px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                background: rgba(18, 26, 40, 0.95);
+                backdrop-filter: blur(15px);
+                border-bottom: 1px solid var(--border-solid);
+                z-index: 100;
+                flex-shrink: 0;
             }
             .header-logo {
-                width: 50px; height: 50px; cursor: pointer; object-fit: contain;
-                filter: drop-shadow(var(--glow-primary)); transition: transform 0.2s;
+                width: 50px;
+                height: 50px;
+                cursor: pointer;
+                object-fit: contain;
+                filter: drop-shadow(var(--glow-primary));
+                transition: transform 0.2s;
             }
             .header-logo:hover { transform: scale(1.1); }
             .header-title-box { display: flex; flex-direction: column; justify-content: center; flex: 1; cursor: pointer; }
             .dynamic-title { font-size: 26px; color: var(--primary); text-shadow: var(--glow-primary); transition: opacity 0.5s ease; }
             .subtitle { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 2px; }
 
-            /* HİBRİT: Crawler Tetikleyici */
-            .crawl-trigger {
-                width: 42px; height: 42px; border-radius: 12px;
-                border: 1px solid var(--border); background: var(--bg-input);
-                color: var(--primary); display: flex; align-items: center; justify-content: center;
-                cursor: pointer; transition: 0.3s; box-shadow: var(--glow-primary); margin: 0 10px;
-            }
-            .crawl-trigger:hover { transform: scale(1.1); background: var(--primary); color: #000; }
-            .crawl-trigger.active { color: var(--warning); border-color: var(--warning); animation: pulse 1.5s infinite; }
-            @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
+            /* İÇERİK */
             #app-screen {
-                display: flex; flex: 1; flex-direction: column;
-                overflow-y: auto; overflow-x: hidden; padding: 20px;
+                display: flex;
+                flex: 1;
+                flex-direction: column;
+                overflow-y: auto;
+                overflow-x: hidden;
+                padding: 20px;
                 -webkit-overflow-scrolling: touch;
             }
 
+            /* ARAMA VE PANEL */
             .search-section {
-                background: var(--bg-surface); padding: 20px; border-radius: 18px;
-                border: 1px solid var(--border-solid); margin-bottom: 20px;
+                background: var(--bg-surface);
+                padding: 20px;
+                border-radius: 18px;
+                border: 1px solid var(--border-solid);
+                margin-bottom: 20px;
             }
             .search-container { display: flex; gap: 10px; margin-bottom: 15px; }
             .custom-input {
-                flex: 1; padding: 16px 20px; border-radius: 14px;
-                border: 2px solid var(--border-solid); background: var(--bg-input);
-                color: var(--primary); font-size: 18px; outline: none; transition: 0.2s;
+                flex: 1;
+                padding: 16px 20px;
+                border-radius: 14px;
+                border: 2px solid var(--border-solid);
+                background: var(--bg-input);
+                color: var(--primary);
+                font-size: 18px;
+                outline: none;
+                transition: 0.2s;
                 font-family: 'Kite One', sans-serif;
             }
             .custom-input:focus { border-color: var(--primary); box-shadow: var(--glow-primary); }
             .btn-search {
-                padding: 0 30px; border-radius: 14px; background: transparent;
-                color: var(--primary); font-size: 20px; border: 2px solid var(--primary);
-                box-shadow: var(--glow-primary); cursor: pointer; transition: var(--transition);
-                text-transform: uppercase; display: flex; align-items: center; gap: 8px;
+                padding: 0 30px;
+                border-radius: 14px;
+                background: transparent;
+                color: var(--primary);
+                font-size: 20px;
+                border: 2px solid var(--primary);
+                box-shadow: var(--glow-primary);
+                cursor: pointer;
+                transition: var(--transition);
+                text-transform: uppercase;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
+            .btn-search:active { transform: scale(0.95); background: rgba(0, 240, 255, 0.1); }
 
+            /* BUTONLAR VE FİLTRELER */
             .quick-actions-grid { 
-                display: flex; gap: 15px; flex-wrap: wrap; align-items: center; 
-                justify-content: space-between; background: rgba(0, 0, 0, 0.2);
-                padding: 15px; border-radius: 12px; border: 1px solid var(--border-solid);
+                display: flex; 
+                gap: 15px; 
+                flex-wrap: wrap; 
+                align-items: center; 
+                justify-content: space-between;
+                background: rgba(0, 0, 0, 0.2);
+                padding: 15px;
+                border-radius: 12px;
+                border: 1px solid var(--border-solid);
             }
+            
             .left-actions { display: flex; gap: 15px; align-items: center; flex-wrap: wrap; }
             .right-actions { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
             .quick-btn {
-                background: var(--bg-input); border-radius: 12px; padding: 10px 15px;
-                cursor: pointer; border: 1px solid var(--border-solid);
-                display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 13px;
-                color: var(--text-main); transition: 0.2s;
+                background: var(--bg-input);
+                border-radius: 12px;
+                padding: 10px 15px;
+                text-align: center;
+                cursor: pointer;
+                border: 1px solid var(--border-solid);
+                display: flex;
+                align-items: center;
+                gap: 8px;
+                transition: 0.2s;
+                font-weight: bold;
+                font-size: 13px;
+                color: var(--text-main);
             }
             .quick-btn:hover { border-color: var(--primary); box-shadow: var(--glow-primary); transform: translateY(-2px); }
 
+            /* SONUÇ BİLDİRİM ROZETİ */
             .result-count-badge {
-                font-family: 'Bangers', cursive; letter-spacing: 1px; font-size: 18px;
-                color: var(--success); background: rgba(16, 185, 129, 0.1);
-                padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3);
-                display: flex; align-items: center; gap: 8px;
+                font-family: 'Bangers', cursive;
+                letter-spacing: 1px;
+                font-size: 18px;
+                color: var(--success);
+                background: rgba(16, 185, 129, 0.1);
+                padding: 8px 15px;
+                border-radius: 10px;
+                border: 1px solid rgba(16, 185, 129, 0.3);
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
             
+            /* KARTLAR */
             .list-container {
-                display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-                gap: 20px; padding-bottom: 30px;
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+                gap: 20px;
+                padding-bottom: 30px;
             }
 
             .record-card {
-                background: var(--bg-surface); border-radius: 18px; padding: 20px;
-                border: 1px solid var(--border-solid); position: relative;
-                display: flex; flex-direction: column; gap: 12px; transition: var(--transition); cursor: pointer;
+                background: var(--bg-surface);
+                border-radius: 18px;
+                padding: 20px;
+                border: 1px solid var(--border-solid);
+                position: relative;
+                display: flex;
+                flex-direction: column;
+                gap: 12px;
+                transition: var(--transition);
+                cursor: pointer;
             }
             .record-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
 
+            /* GÜNCELLENDİ: Kart Görünümleri */
             .record-card.status-kamu { border-color: rgba(0, 240, 255, 0.6); box-shadow: var(--glow-primary); background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, rgba(18, 26, 40, 0.95) 100%); }
             .record-card.status-google { border-color: rgba(251, 188, 5, 0.6); box-shadow: 0 0 15px rgba(251, 188, 5, 0.3); background: linear-gradient(180deg, rgba(251, 188, 5, 0.05) 0%, rgba(18, 26, 40, 0.95) 100%); }
+            .record-card.status-other { border-color: var(--border-solid); }
 
+            .card-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
             .product-name {
-                font-weight: 600; font-size: 15px; color: var(--text-main); line-height: 1.4;
-                display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+                font-weight: 600;
+                font-size: 15px;
+                color: var(--text-main);
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
             }
 
+            /* Yuvarlatılmış Şık Rozetler */
             .store-badge {
-                font-size: 12px; font-weight: 700; padding: 6px 12px; border-radius: 10px;
-                background: var(--bg-input); text-transform: uppercase; display: flex; align-items: center; gap: 6px;
+                font-size: 12px;
+                font-weight: 700;
+                padding: 6px 12px;
+                border-radius: 10px;
+                width: fit-content;
+                letter-spacing: 0.5px;
+                text-transform: uppercase;
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                background: var(--bg-input);
+                box-shadow: inset 0 0 10px rgba(255,255,255,0.05);
             }
 
             .price-area { text-align: left; margin-top: 5px; }
             .amt-paid { font-size: 28px; color: var(--success); text-shadow: 0 0 15px rgba(16,185,129,0.4); line-height: 1; }
 
+            /* FARK GÖSTERGELERİ (MİNİ LİSTE) */
             .diff-container {
-                display: none; margin-top: 10px; padding: 12px; border-radius: 12px;
-                background: var(--bg-base); border: 1px solid var(--border-solid); font-size: 13px;
+                display: none;
+                margin-top: 10px;
+                padding: 12px;
+                border-radius: 12px;
+                background: var(--bg-base);
+                border: 1px solid var(--border-solid);
+                font-size: 13px;
                 animation: fadeIn 0.3s ease;
             }
             .diff-container.show { display: block; }
 
             .match-item {
-                background: var(--bg-input); padding: 12px; border-radius: 10px; margin-top: 8px;
-                border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: var(--transition);
-                display: flex; flex-direction: column; gap: 6px;
+                background: var(--bg-input);
+                padding: 12px;
+                border-radius: 10px;
+                margin-top: 8px;
+                border: 1px solid rgba(255,255,255,0.05);
+                cursor: pointer;
+                transition: var(--transition);
+                display: flex;
+                flex-direction: column;
+                gap: 6px;
             }
-            .diff-badge { padding: 4px 8px; border-radius: 6px; font-family: 'Kite One', sans-serif; font-size: 14px; font-weight: bold; }
+            .match-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            }
+
+            .diff-badge {
+                padding: 4px 8px;
+                border-radius: 6px;
+                font-family: 'Kite One', sans-serif;
+                font-size: 14px;
+                font-weight: bold;
+                letter-spacing: 1px;
+            }
             .diff-cheap { background: rgba(16,185,129,0.15); color: var(--success); border: 1px solid var(--success); }
             .diff-expensive { background: rgba(239,68,68,0.15); color: var(--danger); border: 1px solid var(--danger); }
             .diff-neutral { background: rgba(0,240,255,0.15); color: var(--primary); border: 1px solid var(--primary); }
 
             .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 10px;}
             .card-btn {
-                padding: 12px 5px; border-radius: 10px; font-size: 14px; border: none; cursor: pointer; font-weight: bold; transition: 0.2s;
-                text-align: center; font-family: 'Bangers', cursive; letter-spacing: 1.5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                padding: 12px 5px;
+                border-radius: 10px;
+                font-size: 14px;
+                border: none;
+                cursor: pointer;
+                font-weight: bold;
+                transition: 0.2s;
+                text-align: center;
+                font-family: 'Bangers', cursive;
+                letter-spacing: 1.5px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             }
             .btn-buy { background: var(--success); color: #000; }
             .btn-save { background: var(--info); color: #fff; }
             .btn-delete { background: var(--danger); color: #fff; }
+            .card-btn:active { transform: scale(0.95); }
 
-            /* HİBRİT: Terminal & Bar */
-            .terminal-window {
-                background: #000 !important; color: #00f0ff !important;
-                font-family: 'Courier New', Courier, monospace !important;
-                text-align: left !important; padding: 15px !important;
-                max-height: 250px; overflow-y: auto; border: 1px solid #333;
-                font-size: 11px !important; line-height: 1.4; border-radius: 8px;
-            }
-            .p-bar-container { width: 100%; height: 8px; background: #222; border-radius: 4px; margin-bottom: 12px; overflow: hidden; }
-            .p-bar-fill { height: 100%; background: var(--primary); width: 0%; transition: 0.4s; box-shadow: 0 0 10px var(--primary); }
+            /* CHECKBOX */
+            .checkbox-wrapper { position: absolute; top: 15px; right: 15px; z-index: 5; }
+            input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); cursor: pointer; }
 
+            /* YÜKLEME EKRANI */
             #loader { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 20px; padding: 60px 0; }
             .cyber-spinner {
-                width: 70px; height: 70px; border: 4px solid transparent; border-top-color: var(--primary);
-                border-bottom-color: var(--secondary); border-radius: 50%; animation: spin 1s linear infinite;
+                width: 70px;
+                height: 70px;
+                border: 4px solid transparent;
+                border-top-color: var(--primary);
+                border-bottom-color: var(--secondary);
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+                filter: drop-shadow(var(--glow-primary));
             }
             @keyframes spin { 100% { transform: rotate(360deg); } }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            .cyber-popup { border-radius: 24px !important; background: var(--bg-surface) !important; color: var(--text-main) !important; border: 1px solid var(--primary) !important; }
+            /* CUSTOM SWAL */
+            .swal2-container { backdrop-filter: blur(12px) !important; background: rgba(10, 15, 26, 0.75) !important; }
+            .cyber-popup {
+                border-radius: 24px !important;
+                background: var(--bg-surface) !important;
+                color: var(--text-main) !important;
+                border: 1px solid var(--primary) !important;
+                box-shadow: 0 0 50px rgba(0, 240, 255, 0.2) !important;
+            }
+            .swal2-title { color: var(--primary) !important; font-family: 'Bangers', cursive !important; letter-spacing: 2px; }
+            .swal2-confirm { border-radius: 12px !important; font-family: 'Bangers', cursive !important; letter-spacing: 1.5px; font-size:18px !important; }
 
             @media (max-width: 768px) {
                 .search-container { flex-direction: column; }
+                .btn-search { padding: 15px; justify-content: center; }
                 .list-container { grid-template-columns: 1fr; }
                 .quick-actions-grid { flex-direction: column; align-items: stretch; }
+                .left-actions, .right-actions { justify-content: center; width: 100%; }
+                .quick-btn { flex: 1; justify-content: center; }
             }
         </style>
     </head>
     <body onclick="initFullscreen()">
 
         <div class="app-wrapper">
-            <header class="header">
-                <img src="https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png" alt="Kamu Solar Logo" class="header-logo" onclick="window.open('https://www.kamusolar.com/', '_blank')">
-                <div class="header-title-box font-bangers" onclick="window.open('https://www.kamusolar.com/', '_blank')">
+            <header class="header" onclick="actionPlaySound('click'); window.open('https://www.kamusolar.com/', '_blank')">
+                <img src="https://i.ibb.co/fYY6k2pr/KAMUSOLAR.png" alt="Kamu Solar Logo" class="header-logo">
+                <div class="header-title-box font-bangers">
                     <div class="dynamic-title" id="dynamicText">KAMUSOLAR</div>
                     <div class="subtitle">GÜNCEL FİYATLAR</div>
                 </div>
-
-                <!-- HİBRİT: Minimalist Tetikleyici -->
-                <div class="crawl-trigger" id="crawlBtn" onclick="confirmCrawl()" title="Günlük Liste Güncellemesini Başlat">
-                    <i class="ph ph-cloud-arrow-down" style="font-size: 24px;"></i>
-                </div>
-
                 <div style="margin-left:auto; text-align:right;">
                     <div style="font-size:11px; color:var(--text-muted); font-weight:bold;">DESIGNED by</div>
-                    <a href="mailto:omerzen@msn.com" style="text-decoration:none;">
+                    <a href="mailto:omerzen@msn.com" style="text-decoration:none;" onclick="event.stopPropagation()">
                         <div style="font-size:16px; color:var(--secondary); font-weight:bold; font-family: 'Bangers', cursive; letter-spacing: 1px;">ZEN©2026</div>
                     </a>
                 </div>
@@ -265,37 +402,47 @@
             <div id="app-screen">
                 <div class="search-section">
                     <div class="search-container">
-                        <input type="text" id="searchInput" class="custom-input" placeholder="Ürün, Marka veya Stok Kodu Yazınız..." onkeypress="if(event.key === 'Enter') ara()">
+                        <input type="text" id="searchInput" class="custom-input" placeholder="Lütfen Aramak İstediğiniz Ürünün Adını Yazınız..." onkeypress="if(event.key === 'Enter') ara()">
                         <button class="btn-search font-bangers" onclick="ara()">
                             <i class="ph ph-magnifying-glass"></i> ARA
                         </button>
                     </div>
 
                     <div class="quick-actions-grid" id="actionPanel" style="display: none;">
+                        
                         <div class="left-actions">
                             <div class="result-count-badge" id="resultCountBadge">
                                 <i class="ph ph-list-numbers"></i> <span id="resultCountText">0 Ürün</span>
                             </div>
+
                             <label style="display:flex; align-items:center; gap:8px; font-size:14px; font-weight:bold; cursor:pointer; color:var(--primary);">
                                 <input type="checkbox" id="selectAll" onchange="actionPlaySound(); toggleSelectAll()"> Tümünü Seç
                             </label>
-                            <select id="sortSelect" class="quick-btn" onchange="actionPlaySound(); siralamaDegistir()">
+                            
+                            <select id="sortSelect" class="quick-btn" style="background:var(--bg-input); color:var(--text-main); font-family:'Inter';" onchange="actionPlaySound(); siralamaDegistir()">
                                 <option value="fiyatArtan">Fiyat (Ucuzdan Pahalıya)</option>
                                 <option value="fiyatAzalan">Fiyat (Pahalıdan Ucuza)</option>
                                 <option value="magazaAdi">Mağazaya Göre (A-Z)</option>
                             </select>
                         </div>
+                        
                         <div class="right-actions">
-                            <div class="quick-btn" onclick="generatePDF()"><i class="ph ph-file-pdf" style="color:var(--danger);"></i> PDF</div>
-                            <div class="quick-btn" onclick="generateExcel()"><i class="ph ph-file-xls" style="color:var(--success);"></i> Excel</div>
-                            <div class="quick-btn" onclick="takeScreenshot()"><i class="ph ph-image" style="color:var(--info);"></i> Resim</div>
+                            <div class="quick-btn" onclick="generatePDF()">
+                                <i class="ph ph-file-pdf" style="font-size:22px; color:var(--danger);"></i> PDF
+                            </div>
+                            <div class="quick-btn" onclick="generateExcel()">
+                                <i class="ph ph-file-xls" style="font-size:22px; color:var(--success);"></i> Excel
+                            </div>
+                            <div class="quick-btn" onclick="takeScreenshot()">
+                                <i class="ph ph-image" style="font-size:22px; color:var(--info);"></i> Resim
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="loader">
                     <div class="cyber-spinner"></div>
-                    <div class="font-bangers" style="color:var(--primary); font-size: 26px;">SİSTEMLER TARANIYOR...</div>
+                    <div class="font-bangers" style="color:var(--primary); font-size: 26px; letter-spacing:2px;">SİSTEMLER TARANIYOR...</div>
                 </div>
 
                 <div class="list-container" id="list-container"></div>
@@ -303,80 +450,70 @@
         </div>
 
         <script>
-            // --- HİBRİT: CRAWLER KONTROL ---
-            let crawlInterval = null;
-            async function confirmCrawl() {
-                actionPlaySound();
-                const status = await (await fetch('/crawl-status')).json();
-                if (status.isRunning) { showCrawlProgress(); return; }
-                const today = new Date().toISOString().split('T')[0];
-                if (status.lastManualRunDate === today) {
-                    Swal.fire({ title: 'BİLGİ', text: 'Bugünkü tüm fiyatlar zaten alındı. Yeni tarama yarın yapılabilecektir.', icon: 'info', customClass: { popup: 'cyber-popup' } });
-                    return;
-                }
-                Swal.fire({
-                    title: 'TAM TARAMA BAŞLATILSIN MI?',
-                    text: 'Tüm mağazalardan stok kodları ve marka detayları dahil güncel veriler çekilecektir.',
-                    icon: 'question', showCancelButton: true, confirmButtonText: '[ ONAYLIYORUM ]', cancelButtonText: 'İPTAL', customClass: { popup: 'cyber-popup' }
-                }).then((r) => { if (r.isConfirmed) startCrawl(); });
-            }
-            async function startCrawl() {
-                const res = await fetch('/start-crawl', { method: 'POST' });
-                if (res.ok) showCrawlProgress();
-            }
-            function showCrawlProgress() {
-                Swal.fire({
-                    title: 'MAĞAZALAR TARANIYOR...',
-                    html: `<div class="p-bar-container"><div id="p-bar" class="p-bar-fill"></div></div><div id="p-terminal" class="terminal-window">Bağlanılıyor...</div>`,
-                    showConfirmButton: false, allowOutsideClick: true, customClass: { popup: 'cyber-popup' },
-                    didOpen: () => { updateProgress(); crawlInterval = setInterval(updateProgress, 2000); },
-                    willClose: () => { clearInterval(crawlInterval); }
-                });
-            }
-            async function updateProgress() {
-                const status = await (await fetch('/crawl-status')).json();
-                const term = document.getElementById('p-terminal');
-                const bar = document.getElementById('p-bar');
-                const btn = document.getElementById('crawlBtn');
-                if(status.isRunning) btn.classList.add('active'); else btn.classList.remove('active');
-                if(term && bar) {
-                    bar.style.width = status.percentage + '%';
-                    term.innerHTML = status.progressLog.join('<br>');
-                    term.scrollTop = term.scrollHeight;
-                    if(!status.isRunning && status.percentage === 100) term.innerHTML += '<br><span style="color:lime">>>> İŞLEM TAMAMLANDI.</span>';
-                }
-            }
-
-            // --- ORİJİNAL v4 FONKSİYONLARININ TAMAMI ---
+            // 1. Sağ tık engelleme
             document.addEventListener('contextmenu', event => event.preventDefault());
+
+            // 2. Sentetik Siber Ses & Titreşim Motoru
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             function actionPlaySound(type = 'click') {
                 if (navigator.vibrate) navigator.vibrate(20);
                 if (audioCtx.state === 'suspended') audioCtx.resume();
                 try {
-                    const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
-                    osc.connect(gain); gain.connect(audioCtx.destination);
-                    if (type === 'success') { osc.frequency.setValueAtTime(600, audioCtx.currentTime); gain.gain.setValueAtTime(0.1, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 0.1); }
-                    else { osc.frequency.setValueAtTime(800, audioCtx.currentTime); gain.gain.setValueAtTime(0.05, audioCtx.currentTime); osc.start(); osc.stop(audioCtx.currentTime + 0.05); }
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+
+                    if (type === 'success') {
+                        osc.frequency.setValueAtTime(600, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(1200, audioCtx.currentTime + 0.1);
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        osc.start(); osc.stop(audioCtx.currentTime + 0.1);
+                    } else if (type === 'delete') {
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(200, audioCtx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(100, audioCtx.currentTime + 0.15);
+                        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                        osc.start(); osc.stop(audioCtx.currentTime + 0.15);
+                    } else { 
+                        osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                        gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+                        osc.start(); osc.stop(audioCtx.currentTime + 0.05);
+                    }
                 } catch (e) {}
             }
+
+            // 3. Otomatik Tam Ekran
             let isFullscreen = false;
             function initFullscreen() {
-                if (!isFullscreen) { const docEl = document.documentElement; if (docEl.requestFullscreen) docEl.requestFullscreen().catch(()=>{}); isFullscreen = true; }
+                if (!isFullscreen) {
+                    const docEl = document.documentElement;
+                    const requestFS = docEl.requestFullscreen || docEl.mozRequestFullScreen || docEl.webkitRequestFullScreen || docEl.msRequestFullscreen;
+                    if (requestFS) { requestFS.call(docEl).catch(() => {}); isFullscreen = true; }
+                }
             }
+
+            // KAMUSOLAR / KARAARSLAN Animasyonu
             setInterval(() => {
-                const dt = document.getElementById('dynamicText'); dt.style.opacity = '0';
-                setTimeout(() => { dt.innerText = dt.innerText === 'KAMUSOLAR' ? 'KARAARSLAN' : 'KAMUSOLAR'; dt.style.opacity = '1'; }, 500);
+                const dt = document.getElementById('dynamicText');
+                dt.style.opacity = '0';
+                setTimeout(() => {
+                    dt.innerText = dt.innerText === 'KAMUSOLAR' ? 'KARAARSLAN' : 'KAMUSOLAR';
+                    dt.style.opacity = '1';
+                }, 500);
             }, 3000);
 
-            // Gelişmiş Fiyat Çözücü
+            // Matematiksel Fiyat Çözücü
             function parsePrice(priceStr) {
                 if (!priceStr) return 0;
-                let parts = String(priceStr).split(/[\s\n]+/);
+                let parts = priceStr.split(/[\s\n]+/);
                 let prices = [];
                 for(let p of parts) {
-                    let numStr = p.replace(/[^0-9,.]/g, ''); if(!numStr) continue;
-                    let lastComma = numStr.lastIndexOf(','); let lastDot = numStr.lastIndexOf('.');
+                    let numStr = p.replace(/[^0-9,.]/g, '');
+                    if(!numStr) continue;
+                    let lastComma = numStr.lastIndexOf(',');
+                    let lastDot = numStr.lastIndexOf('.');
                     let val = 0;
                     if (lastComma > lastDot) val = parseFloat(numStr.replace(/\./g, '').replace(',', '.'));
                     else if (lastDot > lastComma) val = parseFloat(numStr.replace(/,/g, ''));
@@ -387,41 +524,84 @@
             }
 
             const formatMoney = (val) => parseFloat(val).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
             function stringToColor(str) {
-                let hash = 0; for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
-                return `hsl(${Math.abs(hash) % 360}, 80%, 65%)`; 
+                let hash = 0;
+                for (let i = 0; i < str.length; i++) hash = str.charCodeAt(i) + ((hash << 5) - hash);
+                const hue = Math.abs(hash) % 360;
+                return `hsl(${hue}, 80%, 65%)`; 
             }
 
             let globalData = [];
 
+            // ARAMA VE YAPAY ZEKA FİLTRESİ
             async function ara() {
                 actionPlaySound();
                 const query = document.getElementById('searchInput').value.trim();
                 if(!query) return;
+
                 document.getElementById('list-container').innerHTML = '';
                 document.getElementById('actionPanel').style.display = 'none';
                 document.getElementById('loader').style.display = 'flex';
+                document.getElementById('selectAll').checked = false;
+
                 try {
                     const response = await fetch(`/ara?q=${encodeURIComponent(query)}`);
                     let veriler = await response.json();
-                    let islenmis = veriler.map((v, index) => ({
-                        id: index, magaza: v.magaza, urunAdi: v.urun_adi || v.urunAdi,
-                        fiyatRaw: parsePrice(v.yeni_fiyat || v.fiyat), link: v.link,
-                        isKamu: v.magaza.toLowerCase().includes('kamu solar'), isGoogle: v.isGoogle || false
+                    
+                    // 1. AŞAMA: Temel Parse İşlemi (Google bayrağı eklendi)
+                    let islenmisVeri = veriler.map((v, index) => ({
+                        id: index,
+                        magaza: v.magaza,
+                        urunAdi: v.urunAdi,
+                        fiyatRaw: parsePrice(v.fiyat),
+                        link: v.link,
+                        isKamu: v.magaza.toLowerCase().includes('kamu solar'),
+                        isGoogle: v.isGoogle || false
                     })).filter(v => v.fiyatRaw > 0);
 
-                    // Orijinal Medyan Filtresi
-                    if(islenmis.length > 3) {
-                        const fiyatlar = islenmis.map(v => v.fiyatRaw).sort((a,b) => a-b);
-                        const medyan = fiyatlar[Math.floor(fiyatlar.length / 2)];
-                        islenmis = islenmis.filter(v => v.fiyatRaw >= (medyan * 0.25) && v.fiyatRaw <= (medyan * 3.0));
+                    // 2. AŞAMA: İsim/Kelime Filtresi (En Az %60-70 Uyum Şartı)
+                    const aramaKelimeleri = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+                    if(aramaKelimeleri.length > 0) {
+                        islenmisVeri = islenmisVeri.filter(v => {
+                            const baslik = v.urunAdi.toLowerCase();
+                            let eslesenKelimeSayisi = 0;
+                            aramaKelimeleri.forEach(kelime => { if(baslik.includes(kelime)) eslesenKelimeSayisi++; });
+                            const uyumOrani = eslesenKelimeSayisi / aramaKelimeleri.length;
+                            return uyumOrani >= 0.6; // Kelimelerin %60'ından fazlası başlıklarda geçmek zorunda!
+                        });
                     }
-                    globalData = islenmis; siralamaDegistir();
-                } catch (e) {
-                    Swal.fire({ title: 'Hata', text: 'Sunucuya bağlanılamadı.', icon: 'error', customClass: { popup: 'cyber-popup' } });
+
+                    // 3. AŞAMA: Medyan Fiyat Algoritması (Kabloları veya Alakasız Milyonluk Sistemleri Temizle)
+                    if(islenmisVeri.length > 3) {
+                        const fiyatlar = islenmisVeri.map(v => v.fiyatRaw).sort((a,b) => a-b);
+                        const mid = Math.floor(fiyatlar.length / 2);
+                        const medyan = fiyatlar.length % 2 !== 0 ? fiyatlar[mid] : (fiyatlar[mid - 1] + fiyatlar[mid]) / 2;
+                        
+                        // Aykırı Değer Sınırları: Medyanın %25'inden düşük veya 3 katından yüksek olanı at
+                        const minFiyat = medyan * 0.25;
+                        const maxFiyat = medyan * 3.0;
+
+                        islenmisVeri = islenmisVeri.filter(v => v.fiyatRaw >= minFiyat && v.fiyatRaw <= maxFiyat);
+                    }
+
+                    globalData = islenmisVeri;
+                    siralamaDegistir();
+
+                } catch (error) {
+                    Swal.fire({
+                        title: 'Bağlantı Hatası',
+                        text: 'Lütfen Node.js sunucusunun çalıştığından emin olun.',
+                        icon: 'error',
+                        confirmButtonColor: 'var(--primary)',
+                        customClass: { popup: 'cyber-popup' }
+                    });
                 } finally {
                     document.getElementById('loader').style.display = 'none';
-                    if(globalData.length > 0) document.getElementById('actionPanel').style.display = 'flex';
+                    if(globalData.length > 0) {
+                        document.getElementById('actionPanel').style.display = 'flex';
+                        document.getElementById('resultCountText').innerText = `${globalData.length} Ürün`;
+                    }
                 }
             }
 
@@ -432,7 +612,8 @@
                     if (!a.isKamu && b.isKamu) return 1;
                     if (sortType === 'fiyatArtan') return a.fiyatRaw - b.fiyatRaw;
                     if (sortType === 'fiyatAzalan') return b.fiyatRaw - a.fiyatRaw;
-                    return a.magaza.localeCompare(b.magaza);
+                    if (sortType === 'magazaAdi') return a.magaza.localeCompare(b.magaza);
+                    return 0;
                 });
                 renderList();
             }
@@ -440,92 +621,340 @@
             function renderList() {
                 const container = document.getElementById('list-container');
                 let html = '';
+
                 globalData.forEach(urun => {
-                    const statusClass = urun.isKamu ? 'status-kamu' : (urun.isGoogle ? 'status-google' : '');
+                    // Google Alışveriş için özel stiller
+                    const statusClass = urun.isKamu ? 'status-kamu' : (urun.isGoogle ? 'status-google' : 'status-other');
                     const badgeColor = urun.isKamu ? '#00f0ff' : (urun.isGoogle ? 'var(--google)' : stringToColor(urun.magaza));
+                    const kamuBadge = urun.isKamu ? `<i class="ph ph-star-fill" style="color:#000"></i>` : (urun.isGoogle ? `<i class="ph ph-google-logo"></i>` : `<i class="ph ph-storefront"></i>`);
+                    const badgeBg = (urun.isKamu || urun.isGoogle) ? badgeColor : `${badgeColor}20`;
+                    const badgeText = (urun.isKamu || urun.isGoogle) ? '#000' : badgeColor;
+
                     html += `
                     <div class="record-card ${statusClass}" id="card-${urun.id}" onclick="kiyasla(${urun.id})">
                         <div class="checkbox-wrapper" onclick="event.stopPropagation()">
-                            <input type="checkbox" class="urun-secim" value="${urun.id}" onclick="updateSelectAllState()">
+                            <input type="checkbox" class="urun-secim" value="${urun.id}" onclick="actionPlaySound(); updateSelectAllState()">
                         </div>
                         <div class="card-header">
-                            <div class="store-badge" style="background-color:${badgeColor}20; color:${badgeColor}; border:1px solid ${badgeColor}">
-                                <i class="ph ph-storefront"></i> ${urun.magaza}
+                            <div class="store-badge" style="background-color: ${badgeBg}; color: ${badgeText}; border-color: ${badgeColor};">
+                                ${kamuBadge} ${urun.magaza}
                             </div>
                         </div>
                         <div class="product-name selectable">${urun.urunAdi}</div>
-                        <div class="price-area"><div class="amt-paid font-kite">${formatMoney(urun.fiyatRaw)} ₺</div></div>
+                        <div class="price-area">
+                            <div class="amt-paid font-kite">${formatMoney(urun.fiyatRaw)} ₺</div>
+                        </div>
                         <div id="diff-${urun.id}" class="diff-container"></div>
                         <div class="btn-group" onclick="event.stopPropagation()">
-                            <button class="card-btn btn-buy" onclick="window.open('${urun.link}', '_blank')">GİT</button>
+                            <button class="card-btn btn-buy" onclick="actionPlaySound(); window.open('${urun.link}', '_blank')">GİT</button>
                             <button class="card-btn btn-save" onclick="linkKopyala('${urun.link}')">KAYDET</button>
                             <button class="card-btn btn-delete" onclick="urunSil(${urun.id})">SİL</button>
                         </div>
                     </div>`;
                 });
-                container.innerHTML = html || '<div style="grid-column:1/-1; text-align:center; padding:40px;">Sonuç bulunamadı.</div>';
+
+                if(globalData.length === 0) {
+                    html = `<div style="grid-column: 1/-1; text-align:center; padding:40px; color:var(--text-muted); font-size:18px;">Belirtilen kriterlere uygun sonuç bulunamadı. Lütfen aramayı daraltın veya kelimeyi değiştirin.</div>`;
+                }
+
+                container.innerHTML = html;
                 document.getElementById('resultCountText').innerText = `${globalData.length} Ürün`;
+                updateSelectAllState();
             }
 
-            // Orijinal Gelişmiş Kıyaslama Mantığı
+            // AKILLI KIYASLAMA VE TIKLANABİLİR LİSTE (RENKLİ & +/-)
             function calculateSimilarity(u1, u2) {
-                let score = 0; const getSpecs = n => (n.match(/\b\d+(w|kw|v|ah|a)?\b/gi) || []).map(m => m.toLowerCase());
-                const s1 = getSpecs(u1.urunAdi); const s2 = getSpecs(u2.urunAdi);
-                s1.forEach(s => { if(s2.includes(s)) score += 15; });
-                const w1 = u1.urunAdi.toLowerCase().split(/\s+/); const w2 = u2.urunAdi.toLowerCase().split(/\s+/);
-                score += (w1.filter(w => w.length > 2 && w2.includes(w)).length * 5);
-                const ratio = Math.min(u1.fiyatRaw, u2.fiyatRaw) / Math.max(u1.fiyatRaw, u2.fiyatRaw);
-                if (ratio > 0.85) score += 20; return score;
+                let score = 0;
+                const getSpecs = name => (name.match(/\b\d+(w|kw|v|ah|a)?\b/gi) || []).map(m => m.toLowerCase());
+                const specs1 = getSpecs(u1.urunAdi);
+                const specs2 = getSpecs(u2.urunAdi);
+                
+                specs1.forEach(s => { if(specs2.includes(s)) score += 15; });
+
+                const words1 = u1.urunAdi.toLowerCase().split(/\s+/);
+                const words2 = u2.urunAdi.toLowerCase().split(/\s+/);
+                const commonWords = words1.filter(w => w.length > 2 && words2.includes(w)).length;
+                score += (commonWords * 5);
+
+                const minP = Math.min(u1.fiyatRaw, u2.fiyatRaw);
+                const maxP = Math.max(u1.fiyatRaw, u2.fiyatRaw);
+                const ratio = minP / maxP;
+                
+                if (ratio > 0.85) score += 20; 
+                else if (ratio < 0.50) score -= 30; 
+
+                return score;
             }
 
             function kiyasla(id) {
-                actionPlaySound(); const urun = globalData.find(u => u.id === id);
+                actionPlaySound();
+                const urun = globalData.find(u => u.id === id);
+                if(!urun) return;
+
                 const diffBox = document.getElementById(`diff-${id}`);
-                if(diffBox.classList.contains('show')) { diffBox.classList.remove('show'); return; }
+                if(diffBox.classList.contains('show')) {
+                    diffBox.classList.remove('show');
+                    return;
+                }
+
+                // Tıklanan kart Kamu ise Rakipleri (Google dahil), Rakip ise Kamu'yu hedef alır
                 const hedefler = urun.isKamu ? globalData.filter(u => !u.isKamu) : globalData.filter(u => u.isKamu);
-                let scored = hedefler.map(h => ({ target: h, score: calculateSimilarity(urun, h) })).filter(st => st.score > 10).sort((a,b) => b.score - a.score).slice(0,3);
-                if(scored.length > 0) {
-                    let htm = `<div style="font-weight:bold; margin-bottom:8px; border-bottom:1px solid #333;">Alternatifler:</div>`;
-                    scored.forEach(s => {
-                        const h = s.target; const diff = h.fiyatRaw - urun.fiyatRaw;
-                        htm += `<div class="match-item" onclick="event.stopPropagation(); window.open('${h.link}','_blank')">
-                            <div style="display:flex; justify-content:space-between; font-size:11px;">
-                                <span style="color:${stringToColor(h.magaza)}">${h.magaza}</span>
-                                <span class="diff-badge ${diff > 0 ? 'diff-expensive':'diff-cheap'}">${diff > 0 ? '+':''}${formatMoney(diff)} ₺</span>
+                
+                if(hedefler.length === 0) {
+                    Swal.fire({title: 'Bilgi', text: `Kıyaslanacak uygun ${urun.isKamu ? 'rakip' : 'Kamu Solar'} ürünü bulunamadı.`, icon: 'info', customClass: {popup: 'cyber-popup'}});
+                    return;
+                }
+
+                let scoredTargets = hedefler.map(h => ({ target: h, score: calculateSimilarity(urun, h) }));
+                scoredTargets = scoredTargets.filter(st => st.score > 0).sort((a,b) => b.score - a.score);
+
+                if(scoredTargets.length > 0) {
+                    let htmlList = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">Tahmini Alternatifler:</div>`;
+                    
+                    const topMatches = scoredTargets.slice(0, 3);
+                    
+                    topMatches.forEach(match => {
+                        const h = match.target;
+                        
+                        // Fark Mantığı: (Alternatifin Fiyatı) - (Tıkladığım Ürünün Fiyatı)
+                        const diff = h.fiyatRaw - urun.fiyatRaw; 
+                        let mesaj, clrClass, brdColor;
+
+                        if (diff > 0) {
+                            mesaj = `+ ${formatMoney(diff)} ₺`; // Alternatif daha pahalı
+                            clrClass = "diff-expensive";
+                            brdColor = "var(--danger)";
+                        } else if (diff < 0) {
+                            mesaj = `- ${formatMoney(Math.abs(diff))} ₺`; // Alternatif daha ucuz
+                            clrClass = "diff-cheap";
+                            brdColor = "var(--success)";
+                        } else {
+                            mesaj = `0,00 ₺ (Aynı)`;
+                            clrClass = "diff-neutral";
+                            brdColor = "var(--primary)";
+                        }
+
+                        // Tıklanabilir Yapı
+                        htmlList += `
+                            <div class="match-item" onclick="event.stopPropagation(); actionPlaySound(); window.open('${h.link}', '_blank')" onmouseover="this.style.borderColor='${brdColor}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
+                                <div style="display:flex; justify-content:space-between; align-items:center;">
+                                    <span style="color:${h.isGoogle ? 'var(--google)' : stringToColor(h.magaza)}; font-weight:bold; font-size:12px;"><i class="ph ${h.isGoogle ? 'ph-google-logo' : 'ph-link'}" style="margin-right:3px;"></i>${h.magaza}</span>
+                                    <span class="diff-badge ${clrClass}">${mesaj}</span>
+                                </div>
+                                <div style="font-size:11px; color:var(--text-muted); line-height:1.2;">${h.urunAdi}</div>
+                                <div style="font-size:14px; font-family:'Kite One'; color:var(--text-main); margin-top:2px;">${formatMoney(h.fiyatRaw)} ₺</div>
                             </div>
-                            <div style="font-size:10px; color:var(--text-muted);">${h.urunAdi}</div>
-                        </div>`;
+                        `;
                     });
-                    diffBox.innerHTML = htm; diffBox.classList.add('show');
+
+                    diffBox.innerHTML = htmlList;
+                    diffBox.className = `diff-container show`;
+                } else {
+                    diffBox.innerHTML = `<div style="text-align:center; color:var(--text-muted);">Benzer özellikte veya fiyatta alternatif bulunamadı.</div>`;
+                    diffBox.className = `diff-container show`;
                 }
             }
 
-            function linkKopyala(url) { actionPlaySound('success'); navigator.clipboard.writeText(url); Swal.fire({ title:'Kopyalandı', icon:'success', timer:800, showConfirmButton:false }); }
-            function urunSil(id) { globalData = globalData.filter(u => u.id !== id); document.getElementById(`card-${id}`).remove(); document.getElementById('resultCountText').innerText = `${globalData.length} Ürün`; }
-            function toggleSelectAll() { const is = document.getElementById('selectAll').checked; document.querySelectorAll('.urun-secim').forEach(c => c.checked = is); }
-            function updateSelectAllState() { const t = document.querySelectorAll('.urun-secim').length; const c = document.querySelectorAll('.urun-secim:checked').length; document.getElementById('selectAll').checked = (t > 0 && t === c); }
+            // KART AKSİYONLARI
+            function linkKopyala(url) {
+                actionPlaySound('success');
+                navigator.clipboard.writeText(url).then(() => {
+                    Swal.fire({
+                        title: 'BAŞARILI!',
+                        text: 'Ürün linki hafızaya kopyalandı.',
+                        icon: 'success',
+                        timer: 1500,
+                        showConfirmButton: false,
+                        customClass: { popup: 'cyber-popup' }
+                    });
+                });
+            }
 
+            function urunSil(id) {
+                actionPlaySound('delete');
+                globalData = globalData.filter(u => u.id !== id);
+                document.getElementById(`card-${id}`).remove();
+                document.getElementById('resultCountText').innerText = `${globalData.length} Ürün`;
+                if(globalData.length === 0) renderList();
+            }
+
+            function toggleSelectAll() {
+                const isChecked = document.getElementById('selectAll').checked;
+                document.querySelectorAll('.urun-secim').forEach(cb => cb.checked = isChecked);
+            }
+
+            function updateSelectAllState() {
+                const total = document.querySelectorAll('.urun-secim').length;
+                const checked = document.querySelectorAll('.urun-secim:checked').length;
+                const selectAllCb = document.getElementById('selectAll');
+                if(total === 0) selectAllCb.checked = false;
+                else selectAllCb.checked = (total === checked);
+            }
+
+            function getSelectedItems() {
+                actionPlaySound();
+                const checkboxes = document.querySelectorAll('.urun-secim:checked');
+                const selectedIds = Array.from(checkboxes).map(cb => parseInt(cb.value));
+                if(selectedIds.length === 0) {
+                    Swal.fire({title: 'Uyarı', text: 'Lütfen işlem yapmak için listeden ürün seçin.', icon: 'warning', customClass:{popup:'cyber-popup'}});
+                    return null;
+                }
+                return globalData.filter(u => selectedIds.includes(u.id));
+            }
+
+            // PROFESYONEL EXCEL ÇIKTISI (EXCELJS)
             async function generateExcel() {
-                const workbook = new ExcelJS.Workbook(); const sheet = workbook.addWorksheet('Rapor');
-                sheet.columns = [{header:'Mağaza', key:'m', width:20}, {header:'Ürün', key:'u', width:50}, {header:'Fiyat', key:'f', width:15}];
-                globalData.forEach(r => sheet.addRow({m:r.magaza, u:r.urunAdi, f:r.fiyatRaw}));
-                const b = await workbook.xlsx.writeBuffer(); saveAs(new Blob([b]), "Analiz.xlsx");
+                const items = getSelectedItems();
+                if(!items) return;
+
+                const workbook = new ExcelJS.Workbook();
+                const sheet = workbook.addWorksheet('Fiyat Analizi');
+
+                sheet.columns = [
+                    { header: 'Sıra', key: 'sira', width: 8 },
+                    { header: 'Mağaza', key: 'magaza', width: 25 },
+                    { header: 'Ürün Adı', key: 'urun', width: 70 },
+                    { header: 'Fiyat (TL)', key: 'fiyat', width: 20 },
+                    { header: 'Aksiyon', key: 'link', width: 20 }
+                ];
+
+                const headerRow = sheet.getRow(1);
+                headerRow.font = { bold: true, color: { argb: 'FFFFFFFF' }, size: 12 };
+                headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF0A0F1A' } };
+                headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+                headerRow.height = 30;
+
+                items.forEach((r, idx) => {
+                    const row = sheet.addRow({
+                        sira: idx + 1,
+                        magaza: r.magaza,
+                        urun: r.urunAdi,
+                        fiyat: r.fiyatRaw,
+                        link: { text: 'Ürüne Git 🔗', hyperlink: r.link }
+                    });
+                    
+                    row.getCell('sira').alignment = { horizontal: 'center' };
+                    row.getCell('fiyat').numFmt = '#,##0.00 "₺"'; // Kusursuz Para Formatı
+                    row.getCell('fiyat').font = { bold: true, color: { argb: 'FF10B981' } }; 
+                    row.getCell('link').font = { bold: true, color: { argb: 'FF0000FF' }, underline: true };
+                    row.getCell('link').alignment = { horizontal: 'center' };
+                    
+                    if(r.isKamu) {
+                        row.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0FFFF' } };
+                    }
+                });
+
+                const buffer = await workbook.xlsx.writeBuffer();
+                saveAs(new Blob([buffer]), "KamuSolar_Analiz.xlsx");
             }
+
+            // GELİŞMİŞ PDF ÇIKTISI (TAM KORUMALI)
             function generatePDF() {
-                const doc = new jsPDF(); doc.text("KAMU SOLAR ANALIZ", 14, 10);
-                const body = globalData.map(r => [r.magaza, r.urunAdi, formatMoney(r.fiyatRaw) + ' TL']);
-                doc.autoTable({ head:[['Magaza','Urun','Fiyat']], body: body }); doc.save('Analiz.pdf');
+                actionPlaySound();
+                const items = getSelectedItems();
+                if(!items) return;
+
+                try {
+                    // Global jsPDF ayarı (Kritik Çözüm)
+                    window.jsPDF = window.jspdf.jsPDF;
+                    const doc = new jsPDF('landscape');
+
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(18);
+                    doc.setTextColor(0, 240, 255);
+                    doc.text("KAMU SOLAR FIYAT ANALIZ RAPORU", doc.internal.pageSize.width / 2, 15, { align: 'center' });
+
+                    const head = [['Sira', 'Magaza', 'Urun Adi', 'Guncel Fiyat', 'Aksiyon']];
+                    const tr2en = s => (s || '').replace(/Ğ/g, 'G').replace(/Ü/g, 'U').replace(/Ş/g, 'S').replace(/İ/g, 'I').replace(/Ö/g, 'O').replace(/Ç/g, 'C').replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's').replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c');
+
+                    const body = items.map((r, i) => [
+                        i + 1,
+                        tr2en(r.magaza),
+                        tr2en(r.urunAdi),
+                        formatMoney(r.fiyatRaw) + ' TL',
+                        '>> SATIN AL <<'
+                    ]);
+
+                    doc.autoTable({
+                        startY: 25,
+                        head: head,
+                        body: body,
+                        theme: 'grid',
+                        columnStyles: {
+                            0: { cellWidth: 15, halign: 'center' },
+                            1: { cellWidth: 50, fontStyle: 'bold' }, 
+                            2: { cellWidth: 'auto' },
+                            3: { cellWidth: 50, halign: 'right', fontStyle: 'bold', textColor: [16, 185, 129] }, 
+                            4: { cellWidth: 35, halign: 'center', textColor: [0, 100, 255], fontStyle: 'bold' } 
+                        },
+                        headStyles: { fillColor: [10, 15, 26], textColor: [0, 240, 255], fontStyle: 'bold', fontSize: 11 },
+                        styles: { fontSize: 10, valign: 'middle', cellPadding: 5 },
+                        
+                        didDrawCell: function(data) {
+                            if (data.column.index === 4 && data.cell.section === 'body') {
+                                const url = items[data.row.index]?.link;
+                                if(url) {
+                                    doc.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: url });
+                                }
+                            }
+                        }
+                    });
+
+                    doc.save('KamuSolar_Rapor.pdf');
+                } catch(e) {
+                    Swal.fire({
+                        title: 'PDF Hatası', 
+                        text: 'PDF oluşturulurken bir hata oluştu: ' + e.message, 
+                        icon: 'error', 
+                        customClass: {popup: 'cyber-popup'}
+                    });
+                }
             }
+
+            // RESİM OLARAK KAYDET
             async function takeScreenshot() {
-                const canvas = await html2canvas(document.getElementById('list-container'), { backgroundColor:'#0a0f1a' });
-                const l = document.createElement('a'); l.download='Ekran.png'; l.href=canvas.toDataURL(); l.click();
+                const items = getSelectedItems();
+                if(!items) return;
+                
+                Swal.fire({
+                    title: 'Resim Oluşturuluyor...',
+                    text: 'Lütfen bekleyin, yüksek kalite ekran görüntüsü işleniyor.',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); },
+                    customClass: { popup: 'cyber-popup' }
+                });
+
+                try {
+                    const listContainer = document.getElementById('list-container');
+                    const canvas = await html2canvas(listContainer, {
+                        backgroundColor: '#0a0f1a',
+                        scale: 2, 
+                        useCORS: true,
+                        scrollY: -window.scrollY 
+                    });
+
+                    const link = document.createElement('a');
+                    link.download = 'KamuSolar_EkranGoruntusu.png';
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    Swal.close();
+                } catch(e) {
+                    Swal.fire({title: 'Hata', text: 'Resim oluşturulamadı.', icon: 'error', customClass:{popup:'cyber-popup'}});
+                }
             }
         </script>
-        
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => { navigator.serviceWorker.register('/sw.js').catch(()=>{}); });
-            }
-        </script>
+
+<!-- Service Worker Kaydı -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(reg => console.log('PWA Kurulumu Hazır!'))
+                .catch(err => console.log('PWA Hatası:', err));
+        });
+    }
+</script>
+
     </body>
 </html>
