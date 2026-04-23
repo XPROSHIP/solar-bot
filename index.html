@@ -2,65 +2,127 @@
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
-    <title>Solar Market Arama</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solar Market | Akıllı Karşılaştırma</title>
+    <!-- Tailwind CSS ve Fontlar -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; }
-        input { padding: 10px; width: 300px; }
-        button { padding: 10px; cursor: pointer; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        .gradient-bg { background: linear-gradient(135deg, #1e293b 0%, #334155 100%); }
+        .card-hover:hover { transform: translateY(-4px); transition: all 0.3s ease; }
     </style>
 </head>
-<body>
+<body class="pb-10">
 
-    <h2>Tüm Marketlerde Ara</h2>
-    <input type="text" id="aramaKutusu" placeholder="Örn: Güneş Paneli">
-    <button onclick="ara()">Ara</button>
+    <!-- Header / Kahraman Alanı -->
+    <div class="gradient-bg text-white pt-12 pb-20 px-6 text-center shadow-lg">
+        <h1 class="text-3xl md:text-5xl font-bold mb-4">☀️ Solar Market</h1>
+        <p class="text-slate-300 mb-8 max-w-lg mx-auto">Tüm mağazalardaki güneş paneli ve enerji ekipmanlarını tek tıkla karşılaştırın.</p>
+        
+        <!-- Arama Barı -->
+        <div class="max-w-2xl mx-auto relative">
+            <input type="text" id="aramaKutusu" 
+                class="w-full p-4 pl-6 rounded-full bg-white text-slate-800 shadow-2xl focus:outline-none focus:ring-4 focus:ring-orange-500 transition-all text-lg"
+                placeholder="Ürün adı yazın (örn: 550w panel)...">
+            <button onclick="ara()" 
+                class="absolute right-2 top-2 bottom-2 px-8 bg-orange-500 hover:bg-orange-600 rounded-full font-semibold transition-colors shadow-lg">
+                Ara
+            </button>
+        </div>
+    </div>
 
-    <div id="loading" style="display:none; margin-top:10px;">Aranıyor, bekle...</div>
+    <!-- Filtreler ve Bilgi -->
+    <div class="max-w-6xl mx-auto -mt-8 px-4">
+        <div class="bg-white rounded-xl shadow-sm p-4 flex flex-wrap justify-between items-center gap-4">
+            <div id="sonucSayisi" class="text-slate-500 font-medium font-sm">Arama yapmak için hazırız.</div>
+            <div class="flex gap-2 text-sm font-semibold">
+                <button onclick="sirala('artan')" class="px-4 py-2 border rounded-lg hover:bg-slate-50">Önce En Ucuz</button>
+                <button onclick="sirala('azalan')" class="px-4 py-2 border rounded-lg hover:bg-slate-50">Önce En Pahalı</button>
+            </div>
+        </div>
+    </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>Mağaza</th>
-                <th>Ürün Adı</th>
-                <th>Fiyat</th>
-                <th>Link</th>
-            </tr>
-        </thead>
-        <tbody id="sonucTablosu">
-            </tbody>
-    </table>
+    <!-- Yükleme Ekranı (Skeleton Screen) -->
+    <div id="loading" class="hidden max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        <div class="bg-white h-48 rounded-xl animate-pulse shadow-sm border border-slate-100"></div>
+        <div class="bg-white h-48 rounded-xl animate-pulse shadow-sm border border-slate-100"></div>
+        <div class="bg-white h-48 rounded-xl animate-pulse shadow-sm border border-slate-100"></div>
+    </div>
+
+    <!-- Sonuç Kartları Grid Sistemi -->
+    <div id="sonucAlani" class="max-w-6xl mx-auto mt-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        <!-- Kartlar buraya gelecek -->
+    </div>
 
     <script>
+        let tumVeriler = [];
+
         async function ara() {
             const kelime = document.getElementById('aramaKutusu').value;
-            if(!kelime) return alert("Kelime gir!");
+            if(!kelime) return;
 
-            document.getElementById('loading').style.display = 'block';
-            document.getElementById('sonucTablosu').innerHTML = '';
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('sonucAlani').innerHTML = '';
+            document.getElementById('sonucSayisi').innerText = 'Aranıyor... Lütfen bekleyin.';
 
             try {
                 const response = await fetch(`/ara?q=${encodeURIComponent(kelime)}`);
-                const veriler = await response.json();
-
-                let html = '';
-                veriler.forEach(urun => {
-                    html += `<tr>
-                        <td>${urun.magaza}</td>
-                        <td>${urun.urunAdi}</td>
-                        <td>${urun.fiyat}</td>
-                        <td><a href="${urun.link}" target="_blank">Git</a></td>
-                    </tr>`;
-                });
-
-                document.getElementById('sonucTablosu').innerHTML = html;
+                tumVeriler = await response.json();
+                ekranaBas(tumVeriler);
             } catch (error) {
-                alert("Sunucuya bağlanılamadı. Node.js sunucusunun açık olduğundan emin ol.");
+                alert("Hata oluştu, lütfen tekrar deneyin.");
             } finally {
-                document.getElementById('loading').style.display = 'none';
+                document.getElementById('loading').classList.add('hidden');
             }
+        }
+
+        function ekranaBas(veriler) {
+            const sonucAlani = document.getElementById('sonucAlani');
+            document.getElementById('sonucSayisi').innerText = `${veriler.length} ürün bulundu.`;
+            
+            if(veriler.length === 0) {
+                sonucAlani.innerHTML = `<div class="col-span-full text-center py-20 text-slate-400">Ürün bulunamadı.</div>`;
+                return;
+            }
+
+            let html = '';
+            veriler.forEach(urun => {
+                html += `
+                <div class="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all card-hover flex flex-col">
+                    <div class="p-6 flex-grow">
+                        <div class="flex justify-between items-start mb-4">
+                            <span class="px-3 py-1 bg-blue-50 text-blue-600 text-xs font-bold rounded-full uppercase tracking-wider">${urun.magaza}</span>
+                        </div>
+                        <h3 class="text-slate-800 font-semibold text-lg line-clamp-2 mb-4 leading-snug h-14">
+                            ${urun.urunAdi}
+                        </h3>
+                        <div class="text-2xl font-bold text-orange-600 mb-2">
+                            ${urun.fiyat}
+                        </div>
+                    </div>
+                    <a href="${urun.link}" target="_blank" 
+                        class="block w-full py-4 text-center bg-slate-50 hover:bg-orange-500 hover:text-white font-bold text-slate-600 transition-colors border-t border-slate-100 uppercase text-sm tracking-widest">
+                        Ürünü İncele →
+                    </a>
+                </div>`;
+            });
+            sonucAlani.innerHTML = html;
+        }
+
+        function sirala(yon) {
+            if (tumVeriler.length === 0) return;
+            
+            // Fiyattaki sayıları ayıklayan minik yardımcı fonksiyon
+            const fiyatTemizle = (f) => parseFloat(f.replace(/[^0-9,.]/g, '').replace('.', '').replace(',', '.'));
+
+            tumVeriler.sort((a, b) => {
+                const fiyatA = fiyatTemizle(a.fiyat);
+                const fiyatB = fiyatTemizle(b.fiyat);
+                return yon === 'artan' ? fiyatA - fiyatB : fiyatB - fiyatA;
+            });
+
+            ekranaBas(tumVeriler);
         }
     </script>
 
