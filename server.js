@@ -64,7 +64,7 @@ app.get('/ara', async (req, res) => {
     if (!kelime) return res.status(400).json({ error: "Kelime girin." });
 
     console.log(`\n===========================================`);
-    console.log(`"${kelime}" için ARAMA BAŞLADI (${HEDEFLER.length} Mağaza)`);
+    console.log(`"${kelime}" için ARAMA BAŞLADI (${HEDEFLER.length} Mağaza + Google Alışveriş)`);
     console.log(`===========================================`);
 
     const headers = { 
@@ -72,6 +72,7 @@ app.get('/ara', async (req, res) => {
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
     };
 
+    // Mevcut mağazaları kazıyan asenkron işlemler
     const promises = HEDEFLER.map(async (site) => {
         try {
             const url = site.arama_url_olustur(kelime);
@@ -89,7 +90,7 @@ app.get('/ara', async (req, res) => {
                     if (link && !link.startsWith('http')) {
                         link = site.url + (link.startsWith('/') ? '' : '/') + link;
                     }
-                    sonuclar.push({ magaza: site.magaza_adi, urunAdi, fiyat, link });
+                    sonuclar.push({ magaza: site.magaza_adi, urunAdi, fiyat, link, isGoogle: false });
                 }
             });
 
@@ -101,6 +102,40 @@ app.get('/ara', async (req, res) => {
             return []; // Site engellerse veya çökerse boş liste dönsün, diğerleri çalışmaya devam etsin.
         }
     });
+
+    // Google Alışveriş (SerpApi) entegrasyonu
+    const pSerpApi = (async () => {
+        try {
+            const SERP_API_KEY = "86cf4c5c700b1b64a24f3b8c68f85f28680ec466dd837d1c56cc8035cbb533dc";
+            const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(kelime)}&gl=tr&hl=tr&tbs=vw:l,mr:1,p_ord:p&api_key=${SERP_API_KEY}`;
+            
+            const response = await axios.get(url, { timeout: 15000 });
+            const sonuclar = response.data.shopping_results;
+
+            if (!sonuclar || sonuclar.length === 0) return [];
+
+            let gData = [];
+            // İlk 10 ürünü al
+            const islenmis = sonuclar.slice(0, 10);
+            for(let u of islenmis) {
+                gData.push({
+                    magaza: u.source || "Google Alışveriş",
+                    urunAdi: u.title,
+                    fiyat: u.price, // API fiyatı string (ör: "₺12.999,00") döndürür, frontend parser bunu çözecektir
+                    link: u.product_link || u.link || "",
+                    isGoogle: true
+                });
+            }
+            console.log(`✅ Google Alışveriş (Trendyol/Hepsiburada vb.): ${gData.length} ürün`);
+            return gData;
+        } catch (e) {
+            console.log(`Hata: Google Alışveriş (SerpApi) başarısız. Kotan dolmuş olabilir. (${e.message})`);
+            return []; // API patlarsa da sistem çalışmaya devam etsin
+        }
+    })();
+
+    // Google Arama işlemini de genel promise havuzuna ekliyoruz
+    promises.push(pSerpApi);
 
     const results = await Promise.allSettled(promises);
     const finalData = results
