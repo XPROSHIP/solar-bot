@@ -1,162 +1,157 @@
 // --- START OF FILE server.js ---
 
 const express = require('express');
+const cors = require('cors');
+const path = require('path');
+const fs = require('fs/promises');
 const axios = require('axios');
 const cheerio = require('cheerio');
-const cors = require('cors');
-const path = require('path'); 
+const cron = require('node-cron');
+const { runCrawler } = require('./crawler'); // Crawler motorumuzu import ediyoruz
 
 const app = express();
 app.use(cors());
 
-// --- ARAMA URL ŞABLONLARI ---
-// DİKKAT: Sitelerin kendi arama motorlarını Stok Kodu, Marka ve Açıklama aramaya zorlayan "Gizli Parametreler" eklendi!
-const URL_FORMAT = {
-    // Ideasoft altyapısı için Stok kodu, açıklama ve alt kategori arama komutları
-    IDEASOFT: (url, k) => `${url}/arama/${encodeURIComponent(k).replace(/%20/g, '+')}?search_in_description=1&search_in_stock_code=1&search_in_brand=1`,
-    
-    // Ticimax altyapısı için Stok kodu ve detay arama komutları
-    TICIMAX: (url, k) => `${url}/?k=${encodeURIComponent(k)}&searchInDesc=1&searchInStockCode=1`,
-    
-    // Shopify zaten otomatik olarak hepsini arar
-    SHOPIFY: (url, k) => `${url}/search?q=${encodeURIComponent(k)}`
+// --- CRAWLER DURUM YÖNETİMİ ---
+let crawlStatus = {
+    isRunning: false,
+    progressLog: ["Beklemede..."],
+    lastManualRunDate: null,
+    lastRunResult: null,
+    percentage: 0
 };
 
-// --- CSS SEÇİCİ ŞABLONLARI (ORİJİNAL - DOKUNULMADI) ---
-const CSS_FORMAT = {
-    IDEASOFT: { 
-        kutu: '.showcase, .product-item, .box-product', 
-        ad: '.showcase-title, .product-title, .name, .product-name', 
-        fiyat: '.showcase-price-new, .product-price, .price, .current-price', 
-        link: 'a' 
-    },
-    TICIMAX: { 
-        kutu: '.ProductPageItem, .ItemOrj, .product-item, .box-product', 
-        ad: '.productName, .detailLink, .product-title, .name', 
-        fiyat: '.discountPrice, .productPrice, .product-price, .price', 
-        link: 'a' 
-    },
-    WOOCOMMERCE: { 
-        kutu: '.product, .type-product, li.product', 
-        ad: '.woocommerce-loop-product__title, h2, h3', 
-        fiyat: '.price, .woocommerce-Price-amount', 
-        link: 'a' 
+// --- GECE 4 OTOMATİK CRAWLER TETİKLEYİCİSİ ---
+cron.schedule('0 4 * * *', () => {
+    console.log('[CRON] Gece 04:00 otomatik tarama başlıyor...');
+    if (!crawlStatus.isRunning) {
+        startFullCrawl('Otomatik Gece Taraması');
+    } else {
+        console.log('[CRON] Tarama zaten çalışıyor, gece taraması atlandı.');
     }
-};
+}, { timezone: "Europe/Istanbul" });
 
-// --- BAŞARIYLA ÇÖZÜLEN 17 MAĞAZA (ORİJİNAL - DOKUNULMADI) ---
-const HEDEFLER =[
-    { magaza_adi: "Kamu Solar", url: "https://www.kamusolar.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.kamusolar.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Global Enerji", url: "https://www.globalenerjimarketim.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.globalenerjimarketim.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Teknovasyon Arge", url: "https://www.teknovasyonarge.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.teknovasyonarge.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Yapı Bahçe", url: "https://www.yapibahce.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.yapibahce.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Kampa", url: "https://www.kampa.com.tr", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.kampa.com.tr", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Solar Sanal Market", url: "https://www.solarsanalmarket.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.solarsanalmarket.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Alize Marin Market", url: "https://www.alizemarinmarket.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.alizemarinmarket.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Enerji Pazarı", url: "https://www.enerjipazari.com.tr", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.enerjipazari.com.tr", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Solar İst Shop", url: "https://www.solaristshop.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.solaristshop.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Solenser Market", url: "https://www.solensermarket.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.solensermarket.com", k), seciciler: CSS_FORMAT.IDEASOFT },
-    { magaza_adi: "Modül Elektronik", url: "https://www.modulelektronik.com", arama_url_olustur: (k) => URL_FORMAT.IDEASOFT("https://www.modulelektronik.com", k), seciciler: CSS_FORMAT.IDEASOFT },
+// --- CRAWLER'I ÇALIŞTIRAN ANA FONKSİYON ---
+async function startFullCrawl(triggerSource = 'Bilinmeyen') {
+    crawlStatus.isRunning = true;
+    crawlStatus.progressLog = [`[${new Date().toLocaleTimeString()}] Tarama başladı. Kaynak: ${triggerSource}`];
+    crawlStatus.percentage = 0;
 
-    { magaza_adi: "Solar AVM", url: "https://solaravm.com", arama_url_olustur: (k) => URL_FORMAT.SHOPIFY("https://solaravm.com", k), seciciler: CSS_FORMAT.TICIMAX },
-    { magaza_adi: "Urla Solar", url: "https://urlasolar.com", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://urlasolar.com", k), seciciler: CSS_FORMAT.WOOCOMMERCE },
-    { magaza_adi: "Prisma Cell", url: "https://www.prismacell.com.tr", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://www.prismacell.com.tr", k), seciciler: CSS_FORMAT.WOOCOMMERCE },
-    { magaza_adi: "Radikal Solar Market", url: "https://market.radikalsolar.com", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://market.radikalsolar.com", k), seciciler: CSS_FORMAT.WOOCOMMERCE },
-    { magaza_adi: "Solar Zirve", url: "https://www.solarzirve.com", arama_url_olustur: (k) => URL_FORMAT.TICIMAX("https://www.solarzirve.com", k), seciciler: CSS_FORMAT.WOOCOMMERCE }
-];
+    const updateCallback = (update) => {
+        const now = new Date().toLocaleTimeString();
+        if (update.status === 'progress') {
+            crawlStatus.progressLog.push(`[${now}] ${update.message}`);
+        } else if (update.status === 'done') {
+            crawlStatus.progressLog.push(`[${now}] ${update.message}`);
+            crawlStatus.isRunning = false;
+            crawlStatus.lastRunResult = update.message;
+        }
+        // İlerleme yüzdesini kabaca hesapla
+        const doneCount = crawlStatus.progressLog.filter(l => l.includes('✅') || l.includes('❌')).length;
+        crawlStatus.percentage = Math.round((doneCount / SITES_TO_CRAWL.length) * 100);
+    };
 
+    try {
+        await runCrawler(updateCallback);
+    } catch (error) {
+        crawlStatus.isRunning = false;
+        crawlStatus.progressLog.push(`[${new Date().toLocaleTimeString()}] KRİTİK HATA: Tarama çöktü! ${error.message}`);
+    }
+}
+
+
+// --- API ENDPOINTLERİ ---
+
+// Manuel Crawler'ı tetikleyen endpoint
+app.post('/start-crawl', (req, res) => {
+    const today = new Date().toISOString().split('T')[0];
+    if (crawlStatus.isRunning) {
+        return res.status(409).json({ message: "Tarama zaten devam ediyor. Lütfen tamamlanmasını bekleyin." });
+    }
+    if (crawlStatus.lastManualRunDate === today) {
+        return res.status(403).json({ message: "Bugünkü manuel tarama hakkınızı zaten kullandınız." });
+    }
+    
+    crawlStatus.lastManualRunDate = today;
+    startFullCrawl('Manuel Tetikleme');
+    res.status(202).json({ message: "Tarama işlemi başarıyla başlatıldı. Durumu /crawl-status adresinden takip edebilirsiniz." });
+});
+
+// Crawler'ın anlık durumunu döndüren endpoint
+app.get('/crawl-status', (req, res) => {
+    res.json(crawlStatus);
+});
+
+
+// --- HİBRİT ARAMA ENDPOINT'İ ---
 app.get('/ara', async (req, res) => {
     const kelime = req.query.q;
     if (!kelime) return res.status(400).json({ error: "Kelime girin." });
 
-    console.log(`\n===========================================`);
-    console.log(`"${kelime}" için ARAMA BAŞLADI (Stok Kodu/Marka Zorlamalı)`);
-    console.log(`===========================================`);
+    console.log(`\n"${kelime}" için HİBRİT ARAMA BAŞLADI...`);
 
-    const headers = { 
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
-    };
-
-    const promises = HEDEFLER.map(async (site) => {
-        try {
-            const url = site.arama_url_olustur(kelime);
-            const response = await axios.get(url, { headers, timeout: 8000 });
-            const $ = cheerio.load(response.data);
-
-            let sonuclar =[];
-            
-            // (ORİJİNAL SORUNSUZ HTML ÇEKME KODUN - Fiyat Çekme Bozulmasın Diye Eski Halinde Bırakıldı)
-            $(site.seciciler.kutu).each((i, el) => {
-                let urunAdi = $(el).find(site.seciciler.ad).text().replace(/\s+/g, ' ').trim();
-                let fiyat = $(el).find(site.seciciler.fiyat).text().replace(/\s+/g, ' ').trim();
-                let link = $(el).find(site.seciciler.link).first().attr('href');
-
-                if (urunAdi && fiyat && urunAdi.length > 3) {
-                    if (link && !link.startsWith('http')) {
-                        link = site.url + (link.startsWith('/') ? '' : '/') + link;
-                    }
-                    sonuclar.push({ magaza: site.magaza_adi, urunAdi, fiyat, link, isGoogle: false });
-                }
-            });
-
-            console.log(`✅ ${site.magaza_adi}: ${sonuclar.length} ürün`);
-            return sonuclar;
-
-      } catch (e) {
-            console.log(`Hata: ${site.magaza_adi} sitesinden veri çekilemedi. (${e.message})`);
-            return []; 
-        }
-    });
-
-    // (ORİJİNAL GOOGLE SERPAPI KODUN)
+    // 1. ADIM: YEREL VERİTABANINDAN (db.json) ANINDA ARAMA
+    let localResults = [];
+    try {
+        const dbData = await fs.readFile('db.json', 'utf-8');
+        const dbJson = JSON.parse(dbData);
+        const k = kelime.toLowerCase();
+        
+        localResults = dbJson.filter(p => 
+            p.urun_adi.toLowerCase().includes(k) ||
+            (p.marka && p.marka.toLowerCase().includes(k)) ||
+            (p.stok_kodu && p.stok_kodu.toLowerCase().includes(k)) ||
+            (p.kategori && p.kategori.toLowerCase().includes(k))
+        ).map(p => ({ ...p, isGoogle: false })); // Google dışı olarak etiketle
+        console.log(`Yerel veritabanından ${localResults.length} sonuç bulundu.`);
+    } catch (e) {
+        console.log("Yerel veritabanı (db.json) bulunamadı veya okunamadı. Yalnızca canlı arama yapılacak.");
+    }
+    
+    // 2. ADIM: GOOGLE SERPAPI'DEN CANLI ARAMA (API Kodun Silinmedi)
     const pSerpApi = (async () => {
         try {
             const SERP_API_KEY = "86cf4c5c700b1b64a24f3b8c68f85f28680ec466dd837d1c56cc8035cbb533dc";
             const url = `https://serpapi.com/search.json?engine=google_shopping&q=${encodeURIComponent(kelime)}&gl=tr&hl=tr&tbs=vw:l,mr:1,p_ord:p&api_key=${SERP_API_KEY}`;
-            
             const response = await axios.get(url, { timeout: 15000 });
-            const sonuclar = response.data.shopping_results;
+            if (!response.data || !response.data.shopping_results) return [];
 
-            if (!sonuclar || sonuclar.length === 0) return [];
-
-            let gData = [];
-            const islenmis = sonuclar.slice(0, 10);
-            for(let u of islenmis) {
-                gData.push({
-                    magaza: u.source || "Google Alışveriş",
-                    urunAdi: u.title,
-                    fiyat: u.price, 
-                    link: u.product_link || u.link || "",
-                    isGoogle: true
-                });
-            }
-            console.log(`✅ Google Alışveriş (Trendyol/Hepsiburada vb.): ${gData.length} ürün`);
-            return gData;
-        } catch (e) {
-            console.log(`Hata: Google Alışveriş (SerpApi) başarısız. Kotan dolmuş olabilir. (${e.message})`);
-            return []; 
-        }
+            return response.data.shopping_results.slice(0, 10).map(u => ({
+                magaza: u.source || "Google Alışveriş",
+                urun_adi: u.title,
+                yeni_fiyat: u.price,
+                link: u.product_link || u.link || "",
+                isGoogle: true
+            }));
+        } catch (e) { return []; }
     })();
 
-    promises.push(pSerpApi);
+    // 3. ADIM: SONUÇLARI BİRLEŞTİR VE GÖNDER
+    const googleResults = await pSerpApi;
+    console.log(`Google Alışveriş'ten ${googleResults.length} sonuç bulundu.`);
 
-    const results = await Promise.allSettled(promises);
-    const finalData = results
-        .filter(r => r.status === 'fulfilled')
-        .map(r => r.value)
-        .flat(); 
-
+    // Mükerrerleri önlemek için link bazlı birleştirme
+    const finalResultsMap = new Map();
+    // Önce yerel sonuçları ekle
+    localResults.forEach(p => finalResultsMap.set(p.link, p));
+    // Sonra Google sonuçlarını ekle (eğer aynı link varsa üzerine yazar)
+    googleResults.forEach(p => finalResultsMap.set(p.link, p));
+    
+    const finalData = Array.from(finalResultsMap.values());
     res.json(finalData);
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Sunucu ${PORT} portunda çalışıyor.`));
 
+// Statik dosyalar için (index.html vb.)
 app.use(express.static(__dirname));
-
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
+
+// crawler.js içindeki site listesini dışarıya sunmak için (kodu tekrar etmemek adına)
+const { SITES_TO_CRAWL } = require('./crawler').SITES_TO_CRAWL;
 
 // --- END OF FILE server.js ---
