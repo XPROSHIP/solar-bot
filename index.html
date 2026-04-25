@@ -3,7 +3,6 @@
     <head>
         <meta charset="UTF-8">
 
-<!-- PWA Manifest ve İkon Ayarları -->
 <link rel="manifest" href="/manifest.json">
 <meta name="theme-color" content="#0a0f1a">
 <meta name="mobile-web-app-capable" content="yes">
@@ -45,7 +44,7 @@
                 --danger: #ef4444;
                 --warning: #f59e0b;
                 --info: #8b5cf6;
-                --google: #fbbc05; /* Google Turuncu/Sarı rengi */
+                --google: #fbbc05;
                 --border-solid: #1e293b;
                 --border: rgba(0, 240, 255, 0.2);
                 --glow-primary: 0 0 15px rgba(0, 240, 255, 0.4);
@@ -60,7 +59,6 @@
                 padding: 0;
             }
 
-            /* Sağ Tık Engeli & Metin Seçimi Yönetimi */
             html, body {
                 height: 100%;
                 width: 100%;
@@ -76,7 +74,6 @@
             }
             input, textarea, .selectable { user-select: auto; }
 
-            /* Custom Scrollbar */
             ::-webkit-scrollbar { width: 6px; }
             ::-webkit-scrollbar-track { background: var(--bg-base); }
             ::-webkit-scrollbar-thumb { background: var(--border-solid); border-radius: 10px; }
@@ -99,7 +96,6 @@
             .font-bangers { font-family: 'Bangers', cursive; letter-spacing: 1.5px; }
             .font-kite { font-family: 'Kite One', sans-serif; }
 
-            /* HEADER */
             .header {
                 padding: 15px 20px;
                 display: flex;
@@ -124,7 +120,6 @@
             .dynamic-title { font-size: 26px; color: var(--primary); text-shadow: var(--glow-primary); transition: opacity 0.5s ease; }
             .subtitle { font-size: 11px; font-weight: 600; color: var(--text-muted); letter-spacing: 2px; }
 
-            /* İÇERİK */
             #app-screen {
                 display: flex;
                 flex: 1;
@@ -135,7 +130,6 @@
                 -webkit-overflow-scrolling: touch;
             }
 
-            /* ARAMA VE PANEL */
             .search-section {
                 background: var(--bg-surface);
                 padding: 20px;
@@ -174,7 +168,6 @@
             }
             .btn-search:active { transform: scale(0.95); background: rgba(0, 240, 255, 0.1); }
 
-            /* BUTONLAR VE FİLTRELER */
             .quick-actions-grid { 
                 display: flex; 
                 gap: 15px; 
@@ -207,7 +200,6 @@
             }
             .quick-btn:hover { border-color: var(--primary); box-shadow: var(--glow-primary); transform: translateY(-2px); }
 
-            /* SONUÇ BİLDİRİM ROZETİ */
             .result-count-badge {
                 font-family: 'Bangers', cursive;
                 letter-spacing: 1px;
@@ -222,7 +214,6 @@
                 gap: 8px;
             }
             
-            /* KARTLAR */
             .list-container {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -244,7 +235,6 @@
             }
             .record-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
 
-            /* GÜNCELLENDİ: Kart Görünümleri */
             .record-card.status-kamu { border-color: rgba(0, 240, 255, 0.6); box-shadow: var(--glow-primary); background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, rgba(18, 26, 40, 0.95) 100%); }
             .record-card.status-google { border-color: rgba(251, 188, 5, 0.6); box-shadow: 0 0 15px rgba(251, 188, 5, 0.3); background: linear-gradient(180deg, rgba(251, 188, 5, 0.05) 0%, rgba(18, 26, 40, 0.95) 100%); }
             .record-card.status-other { border-color: var(--border-solid); }
@@ -261,7 +251,6 @@
                 overflow: hidden;
             }
 
-            /* Yuvarlatılmış Şık Rozetler */
             .store-badge {
                 font-size: 12px;
                 font-weight: 700;
@@ -280,7 +269,6 @@
             .price-area { text-align: left; margin-top: 5px; }
             .amt-paid { font-size: 28px; color: var(--success); text-shadow: 0 0 15px rgba(16,185,129,0.4); line-height: 1; }
 
-            /* FARK GÖSTERGELERİ (MİNİ LİSTE) */
             .diff-container {
                 display: none;
                 margin-top: 10px;
@@ -341,11 +329,9 @@
             .btn-delete { background: var(--danger); color: #fff; }
             .card-btn:active { transform: scale(0.95); }
 
-            /* CHECKBOX */
             .checkbox-wrapper { position: absolute; top: 15px; right: 15px; z-index: 5; }
             input[type="checkbox"] { width: 22px; height: 22px; accent-color: var(--primary); cursor: pointer; }
 
-            /* YÜKLEME EKRANI */
             #loader { display: none; flex-direction: column; justify-content: center; align-items: center; gap: 20px; padding: 60px 0; }
             .cyber-spinner {
                 width: 70px;
@@ -360,7 +346,6 @@
             @keyframes spin { 100% { transform: rotate(360deg); } }
             @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-            /* CUSTOM SWAL */
             .swal2-container { backdrop-filter: blur(12px) !important; background: rgba(10, 15, 26, 0.75) !important; }
             .cyber-popup {
                 border-radius: 24px !important;
@@ -534,6 +519,26 @@
 
             let globalData = [];
 
+            // Resimlerden Çıkarılan Tam Marka Listesi Seti
+            const markalar = new Set([
+                "victron", "lexron", "alkan", "alpex", "juta", "pantec", "sako", "polat", "tescom", "wd",
+                "meanwell", "aeron", "philips", "suneng", "bullwark", "vguard", "hes", "siemens", "jyins",
+                "carspa", "smart", "eastman", "deye", "orbus", "gse", "or-tec", "havensis", "öznur", "solartürk",
+                "motech", "cw", "enerji", "tommatech", "mexxsun", "abax", "aes", "agromot", "alfa", "arkat",
+                "aspilsan", "atex", "auxsol", "betatek", "bluetti", "bosch", "bramax", "bussman", "byd", "cat",
+                "cata", "corpus", "cotek", "dahua", "daly", "eastron", "ecosol", "energima", "eng", "entes",
+                "epever", "ev", "eve", "exelon", "fimer", "fixaj", "frecon", "fronius", "gazioğlu", "gmg",
+                "hegel", "herotech", "ht", "saae", "huawei", "hubstein", "inox", "jk", "ji", "kong", "kaco",
+                "kamusolar", "karaarslan", "linetech", "lithium", "marine", "matech", "max", "mc4", "megacell",
+                "megaval", "midival", "mil", "mta", "multiplus", "must", "mustang", "orbit", "ortech", "outdo",
+                "parla", "phoenix", "phonosolar", "pomega", "poseidon", "prisma", "prysmian", "pulnix", "pwm",
+                "pylontech", "rectares", "redbud", "rhofa", "ritar", "s-link", "safe", "farm", "saj", "schneider",
+                "sea", "sun", "set", "solar", "sigma", "socomec", "solarinka", "solarkol", "solarmd", "solartronics",
+                "solax", "solinved", "solis", "solplanet", "spark", "submersible", "sumry", "suneco", "sunon",
+                "sunpax", "sunpower", "teknim", "teknogreen", "torges", "tsm", "twi", "uretech", "vega", "venta",
+                "voltronics", "voole", "weg", "yilsolar", "zmr"
+            ]);
+
             // ARAMA VE YAPAY ZEKA FİLTRESİ
             async function ara() {
                 actionPlaySound();
@@ -549,7 +554,6 @@
                     const response = await fetch(`/ara?q=${encodeURIComponent(query)}`);
                     let veriler = await response.json();
                     
-                    // 1. AŞAMA: Temel Parse İşlemi (Google bayrağı eklendi)
                     let islenmisVeri = veriler.map((v, index) => ({
                         id: index,
                         magaza: v.magaza,
@@ -560,25 +564,28 @@
                         isGoogle: v.isGoogle || false
                     })).filter(v => v.fiyatRaw > 0);
 
-                    // 2. AŞAMA: İsim/Kelime Filtresi (En Az %60-70 Uyum Şartı)
-                    const aramaKelimeleri = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+                    // Marka temizleme kuralı devrede
+                    let aramaKelimeleri = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+                    
                     if(aramaKelimeleri.length > 0) {
+                        // Marka adlarını kullanıcının aramasından izole et (başka kelimeler varsa)
+                        let temizKelimeler = aramaKelimeleri.filter(k => !markalar.has(k));
+                        let finalKelimeler = temizKelimeler.length > 0 ? temizKelimeler : aramaKelimeleri;
+
                         islenmisVeri = islenmisVeri.filter(v => {
                             const baslik = v.urunAdi.toLowerCase();
                             let eslesenKelimeSayisi = 0;
-                            aramaKelimeleri.forEach(kelime => { if(baslik.includes(kelime)) eslesenKelimeSayisi++; });
-                            const uyumOrani = eslesenKelimeSayisi / aramaKelimeleri.length;
-                            return uyumOrani >= 0.6; // Kelimelerin %60'ından fazlası başlıklarda geçmek zorunda!
+                            finalKelimeler.forEach(kelime => { if(baslik.includes(kelime)) eslesenKelimeSayisi++; });
+                            const uyumOrani = eslesenKelimeSayisi / finalKelimeler.length;
+                            return uyumOrani >= 0.6; // Temizlenmiş kelimeler %60 ile eşleşmeli
                         });
                     }
 
-                    // 3. AŞAMA: Medyan Fiyat Algoritması (Kabloları veya Alakasız Milyonluk Sistemleri Temizle)
                     if(islenmisVeri.length > 3) {
                         const fiyatlar = islenmisVeri.map(v => v.fiyatRaw).sort((a,b) => a-b);
                         const mid = Math.floor(fiyatlar.length / 2);
                         const medyan = fiyatlar.length % 2 !== 0 ? fiyatlar[mid] : (fiyatlar[mid - 1] + fiyatlar[mid]) / 2;
                         
-                        // Aykırı Değer Sınırları: Medyanın %25'inden düşük veya 3 katından yüksek olanı at
                         const minFiyat = medyan * 0.25;
                         const maxFiyat = medyan * 3.0;
 
@@ -623,7 +630,6 @@
                 let html = '';
 
                 globalData.forEach(urun => {
-                    // Google Alışveriş için özel stiller
                     const statusClass = urun.isKamu ? 'status-kamu' : (urun.isGoogle ? 'status-google' : 'status-other');
                     const badgeColor = urun.isKamu ? '#00f0ff' : (urun.isGoogle ? 'var(--google)' : stringToColor(urun.magaza));
                     const kamuBadge = urun.isKamu ? `<i class="ph ph-star-fill" style="color:#000"></i>` : (urun.isGoogle ? `<i class="ph ph-google-logo"></i>` : `<i class="ph ph-storefront"></i>`);
@@ -662,7 +668,6 @@
                 updateSelectAllState();
             }
 
-            // AKILLI KIYASLAMA VE TIKLANABİLİR LİSTE (RENKLİ & +/-)
             function calculateSimilarity(u1, u2) {
                 let score = 0;
                 const getSpecs = name => (name.match(/\b\d+(w|kw|v|ah|a)?\b/gi) || []).map(m => m.toLowerCase());
@@ -697,7 +702,6 @@
                     return;
                 }
 
-                // Tıklanan kart Kamu ise Rakipleri (Google dahil), Rakip ise Kamu'yu hedef alır
                 const hedefler = urun.isKamu ? globalData.filter(u => !u.isKamu) : globalData.filter(u => u.isKamu);
                 
                 if(hedefler.length === 0) {
@@ -715,17 +719,15 @@
                     
                     topMatches.forEach(match => {
                         const h = match.target;
-                        
-                        // Fark Mantığı: (Alternatifin Fiyatı) - (Tıkladığım Ürünün Fiyatı)
                         const diff = h.fiyatRaw - urun.fiyatRaw; 
                         let mesaj, clrClass, brdColor;
 
                         if (diff > 0) {
-                            mesaj = `+ ${formatMoney(diff)} ₺`; // Alternatif daha pahalı
+                            mesaj = `+ ${formatMoney(diff)} ₺`; 
                             clrClass = "diff-expensive";
                             brdColor = "var(--danger)";
                         } else if (diff < 0) {
-                            mesaj = `- ${formatMoney(Math.abs(diff))} ₺`; // Alternatif daha ucuz
+                            mesaj = `- ${formatMoney(Math.abs(diff))} ₺`; 
                             clrClass = "diff-cheap";
                             brdColor = "var(--success)";
                         } else {
@@ -734,7 +736,6 @@
                             brdColor = "var(--primary)";
                         }
 
-                        // Tıklanabilir Yapı
                         htmlList += `
                             <div class="match-item" onclick="event.stopPropagation(); actionPlaySound(); window.open('${h.link}', '_blank')" onmouseover="this.style.borderColor='${brdColor}'" onmouseout="this.style.borderColor='rgba(255,255,255,0.05)'">
                                 <div style="display:flex; justify-content:space-between; align-items:center;">
@@ -755,7 +756,6 @@
                 }
             }
 
-            // KART AKSİYONLARI
             function linkKopyala(url) {
                 actionPlaySound('success');
                 navigator.clipboard.writeText(url).then(() => {
@@ -802,7 +802,6 @@
                 return globalData.filter(u => selectedIds.includes(u.id));
             }
 
-            // PROFESYONEL EXCEL ÇIKTISI (EXCELJS)
             async function generateExcel() {
                 const items = getSelectedItems();
                 if(!items) return;
@@ -834,7 +833,7 @@
                     });
                     
                     row.getCell('sira').alignment = { horizontal: 'center' };
-                    row.getCell('fiyat').numFmt = '#,##0.00 "₺"'; // Kusursuz Para Formatı
+                    row.getCell('fiyat').numFmt = '#,##0.00 "₺"';
                     row.getCell('fiyat').font = { bold: true, color: { argb: 'FF10B981' } }; 
                     row.getCell('link').font = { bold: true, color: { argb: 'FF0000FF' }, underline: true };
                     row.getCell('link').alignment = { horizontal: 'center' };
@@ -848,14 +847,12 @@
                 saveAs(new Blob([buffer]), "KamuSolar_Analiz.xlsx");
             }
 
-            // GELİŞMİŞ PDF ÇIKTISI (TAM KORUMALI)
             function generatePDF() {
                 actionPlaySound();
                 const items = getSelectedItems();
                 if(!items) return;
 
                 try {
-                    // Global jsPDF ayarı (Kritik Çözüm)
                     window.jsPDF = window.jspdf.jsPDF;
                     const doc = new jsPDF('landscape');
 
@@ -911,7 +908,6 @@
                 }
             }
 
-            // RESİM OLARAK KAYDET
             async function takeScreenshot() {
                 const items = getSelectedItems();
                 if(!items) return;
@@ -945,7 +941,6 @@
             }
         </script>
 
-<!-- Service Worker Kaydı -->
 <script>
     if ('serviceWorker' in navigator) {
         window.addEventListener('load', () => {
