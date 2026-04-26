@@ -225,9 +225,10 @@
             .filter-row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
             .filter-input {
                 background: var(--bg-input); border: 1px solid var(--border-solid); color: var(--text-main);
-                padding: 8px 12px; border-radius: 8px; width: 120px; font-size: 14px; outline:none;
+                padding: 8px 12px; border-radius: 8px; flex: 1; min-width: 80px; font-size: 14px; outline:none;
             }
             .filter-input:focus { border-color: var(--primary); }
+            
             .brand-tags-container { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 5px; }
             .brand-tag {
                 padding: 4px 10px; border-radius: 20px; font-size: 12px; font-weight: bold; cursor: pointer;
@@ -235,9 +236,13 @@
             }
             .brand-tag:hover, .brand-tag.active { background: var(--primary); color: #000; border-color: var(--primary); box-shadow: var(--glow-primary); }
 
-            .stats-dashboard { display: flex; gap: 10px; flex-wrap: wrap; }
+            .stats-dashboard { 
+                display: grid; 
+                grid-template-columns: 1fr 1fr; 
+                gap: 10px; 
+            }
             .stat-card {
-                flex: 1; min-width: 120px; background: var(--bg-input); padding: 10px; border-radius: 10px;
+                background: var(--bg-input); padding: 10px; border-radius: 10px;
                 border: 1px solid var(--border-solid); text-align: center; display:flex; flex-direction: column; justify-content:center;
             }
             .stat-title { font-size: 11px; color: var(--text-muted); text-transform: uppercase; font-weight: bold; }
@@ -269,56 +274,48 @@
                 background: rgba(16, 185, 129, 0.1); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(16, 185, 129, 0.3); display: flex; align-items: center; gap: 8px;
             }
             
-            /* View Modes */
+            /* Görünüm Modları */
             .list-container {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
                 gap: 20px; padding-bottom: 30px; transition: var(--transition);
             }
-            /* Excel/List View Modu */
-            .list-container.list-view {
-                grid-template-columns: 1fr; gap: 10px;
-            }
-            .list-container.list-view .record-card {
-                flex-direction: row; align-items: center; padding: 10px 15px; gap: 15px;
-            }
-            .list-container.list-view .card-header { flex-direction: row; min-width: 150px; }
-            .list-container.list-view .product-name { flex: 1; -webkit-line-clamp: 1; margin:0; }
-            .list-container.list-view .price-area { margin:0; min-width: 120px; text-align:right; }
-            .list-container.list-view .amt-paid { font-size: 20px; }
-            .list-container.list-view .btn-group { grid-template-columns: auto auto auto; margin:0; padding:0; }
-            .list-container.list-view .card-btn { padding: 8px 12px; font-size: 12px; }
-            .list-container.list-view .checkbox-wrapper { position: relative; top: 0; right: 0; }
 
             /* Swipe Wrapper (Native Mobil Hissiyat) */
             .swipe-wrapper {
-                position: relative; width: 100%; overflow: hidden; border-radius: 18px;
+                position: relative; width: 100%; overflow: hidden; border-radius: 18px; margin-top: 15px; /* Etikete yer açar */
             }
             .swipe-bg {
                 position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 18px;
-                display: flex; justify-content: space-between; align-items: center; padding: 0 30px; font-size: 24px; color: white; z-index: 1;
+                display: flex; justify-content: space-between; align-items: center; padding: 0 30px; 
+                font-family: 'Bangers', cursive; font-size: 16px; letter-spacing: 1.5px;
+                z-index: 1; opacity: 0; transition: opacity 0.2s; pointer-events: none;
             }
-            .swipe-bg .left { color: var(--warning); font-weight: bold; } /* Favori Rengi */
-            .swipe-bg .right { color: var(--danger); font-weight: bold; } /* Silme Rengi */
+            .swipe-wrapper.swiping .swipe-bg { opacity: 1; } /* Sadece kaydırınca görünür */
+            .swipe-bg .left { color: var(--warning); } /* Favori Rengi */
+            .swipe-bg .right { color: var(--danger); } /* Silme Rengi */
 
+            /* Kartın Kendisi - Opak yapıldı ki arka plan yazıları sızmasın */
             .record-card {
-                background: var(--bg-surface); border-radius: 18px; padding: 20px; border: 1px solid var(--border-solid);
-                position: relative; display: flex; flex-direction: column; gap: 12px; transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+                background-color: var(--bg-surface);
+                border-radius: 18px; padding: 20px; border: 1px solid var(--border-solid);
+                position: relative; display: flex; flex-direction: column; gap: 12px; 
+                transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
                 cursor: pointer; z-index: 2;
             }
+            /* Renkli Overlay Degrade (Alttaki arka plana sızmaz) */
+            .record-card.status-kamu { background-image: linear-gradient(180deg, rgba(0, 240, 255, 0.1) 0%, transparent 100%); border-color: rgba(0, 240, 255, 0.6); box-shadow: var(--glow-primary); }
+            .record-card.status-google { background-image: linear-gradient(180deg, rgba(251, 188, 5, 0.1) 0%, transparent 100%); border-color: rgba(251, 188, 5, 0.6); box-shadow: 0 0 15px rgba(251, 188, 5, 0.3); }
+            .record-card.status-other { background-image: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%); border-color: var(--border-solid); }
+            
             /* Klavye Odağı */
             .record-card.focused { border-color: var(--secondary); box-shadow: var(--glow-secondary); transform: scale(1.02); z-index: 10; }
-            
             .record-card:hover:not(.list-view .record-card) { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
             body.light-theme .record-card:hover:not(.list-view .record-card) { box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
-            .record-card.status-kamu { border-color: rgba(0, 240, 255, 0.6); box-shadow: var(--glow-primary); background: linear-gradient(180deg, rgba(0, 240, 255, 0.05) 0%, var(--bg-surface) 100%); }
-            .record-card.status-google { border-color: rgba(251, 188, 5, 0.6); box-shadow: 0 0 15px rgba(251, 188, 5, 0.3); background: linear-gradient(180deg, rgba(251, 188, 5, 0.05) 0%, var(--bg-surface) 100%); }
-            .record-card.status-other { border-color: var(--border-solid); }
-
-            /* En Ucuz / En Pahalı Rozetleri */
+            /* En Ucuz / En Pahalı Rozetleri Özgürleştirildi */
             .price-badge {
-                position: absolute; top: -10px; left: 15px; font-size: 10px; font-weight: bold; padding: 4px 10px; border-radius: 10px;
+                position: absolute; top: -14px; left: 15px; font-size: 10px; padding: 4px 10px; border-radius: 10px;
                 text-transform: uppercase; letter-spacing: 1px; z-index: 5; box-shadow: 0 2px 10px rgba(0,0,0,0.5); font-family: 'Bangers', cursive; letter-spacing: 1.5px;
             }
             .badge-ucuz { background: var(--success); color: #000; border: 1px solid #fff; }
@@ -336,7 +333,7 @@
 
             .diff-container { display: none; margin-top: 10px; padding: 12px; border-radius: 12px; background: var(--bg-base); border: 1px solid var(--border-solid); font-size: 13px; animation: fadeIn 0.3s ease; }
             .diff-container.show { display: block; }
-            .list-view .diff-container { grid-column: 1 / -1; margin-top: 0; } /* List view adjustment */
+            .list-view .diff-container { grid-column: 1 / -1; margin-top: 0; } 
 
             .match-item { background: var(--bg-input); padding: 12px; border-radius: 10px; margin-top: 8px; border: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: var(--transition); display: flex; flex-direction: column; gap: 6px; }
             .match-item:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.4); }
@@ -347,19 +344,18 @@
             .diff-neutral { background: rgba(0,240,255,0.15); color: var(--primary); border: 1px solid var(--primary); }
 
             .btn-group { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: auto; padding-top: 10px;}
-            .card-btn { padding: 12px 5px; border-radius: 10px; font-size: 14px; border: none; cursor: pointer; font-weight: bold; transition: background 1.5s ease-out, transform 0.2s, background-color 0.2s; text-align: center; font-family: 'Bangers', cursive; letter-spacing: 1.5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); overflow: hidden; position: relative; }
+            .card-btn { padding: 12px 5px; border-radius: 10px; font-size: 14px; border: none; cursor: pointer; font-weight: bold; transition: transform 0.2s, background-color 0.2s; text-align: center; font-family: 'Bangers', cursive; letter-spacing: 1.5px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
             body.light-theme .card-btn { box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
             
             .btn-buy { background: var(--success); color: #000; }
             .btn-save { background: var(--info); color: #fff; }
-            .btn-delete { background: var(--bg-input); color: var(--danger); border: 1px solid var(--danger); }
             
-            /* Long Press Animasyonu için */
-            .btn-delete.deleting {
-                background: var(--danger) !important;
-                color: white !important;
-                transition: background 1.5s ease-in;
-            }
+            /* Long Press Progress Bar (SİL) Animasyonu */
+            .btn-delete { background: transparent; color: var(--danger); border: 1px solid var(--danger); position: relative; overflow: hidden; z-index: 1; }
+            .btn-delete::before { content: ''; position: absolute; top: 0; left: 0; height: 100%; width: 0%; background: var(--danger); z-index: -1; transition: width 0s; }
+            .btn-delete.deleting::before { width: 100%; transition: width 1.5s linear; }
+            .btn-delete.deleting { color: white !important; }
+            
             .card-btn:active { transform: scale(0.95); }
 
             .checkbox-wrapper { position: absolute; top: 15px; right: 15px; z-index: 5; }
@@ -375,6 +371,20 @@
             .swal2-title { color: var(--primary) !important; font-family: 'Bangers', cursive !important; letter-spacing: 2px; }
             .swal2-confirm { border-radius: 12px !important; font-family: 'Bangers', cursive !important; letter-spacing: 1.5px; font-size:18px !important; }
 
+            /* --- Mükemmel List/Excel Görünümü (Tüm Ekranlar için Kompakt) --- */
+            .list-container.list-view { grid-template-columns: 1fr; gap: 10px; }
+            .list-container.list-view .swipe-wrapper { margin-top: 8px; }
+            .list-container.list-view .record-card { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px; gap: 10px; }
+            .list-container.list-view .card-header { min-width: auto; flex-shrink: 0; margin: 0; }
+            .list-container.list-view .store-badge { font-size: 10px; padding: 4px 8px; }
+            .list-container.list-view .product-name { flex: 1; min-width: 150px; font-size: 13px; margin: 0; -webkit-line-clamp: 2; line-height: 1.2; }
+            .list-container.list-view .price-area { min-width: auto; text-align: right; flex-shrink: 0; margin: 0; }
+            .list-container.list-view .amt-paid { font-size: 18px; }
+            .list-container.list-view .btn-group { display: flex; flex-direction: row; gap: 5px; padding: 0; margin: 0; }
+            .list-container.list-view .card-btn { padding: 6px 12px; font-size: 11px; }
+            .list-container.list-view .checkbox-wrapper { position: static; margin-right: 5px; }
+            .list-container.list-view .price-badge { top: 0; left: 0; position: static; margin-right: 5px; font-size: 9px; padding: 3px 6px; display: inline-block; }
+
             @media (max-width: 768px) {
                 .search-container { flex-direction: column; }
                 .btn-search { padding: 15px; justify-content: center; }
@@ -382,10 +392,13 @@
                 .quick-actions-grid { flex-direction: column; align-items: stretch; }
                 .left-actions, .right-actions { justify-content: center; width: 100%; }
                 .quick-btn { flex: 1; justify-content: center; }
-                .list-container.list-view .record-card { flex-wrap: wrap; }
-                .list-container.list-view .btn-group { grid-column: 1 / -1; width: 100%; }
+                
                 .header-controls { margin-left: auto; }
                 .header-logo { width: 40px; height: 40px; }
+                
+                /* List View Mobil Daralma Çözümü */
+                .list-container.list-view .btn-group { width: 100%; justify-content: space-between; flex: 100%; margin-top: 5px; }
+                .list-container.list-view .card-btn { flex: 1; }
             }
         </style>
     </head>
@@ -436,22 +449,20 @@
 
                     <div class="advanced-panel" id="advancedPanel">
                         <div class="filter-row">
-                            <span style="font-size: 13px; font-weight:bold; color:var(--text-muted);">Fiyat Aralığı:</span>
+                            <!-- Label kaldırıldı, Temizle butonu daraltıldı, Inputlara tam esneklik verildi -->
                             <input type="number" id="minPriceFilter" class="filter-input" placeholder="Min ₺" oninput="applyFiltersAndRender()">
-                            <span style="color:var(--text-muted);">-</span>
+                            <span style="color:var(--text-muted); font-weight:bold;">-</span>
                             <input type="number" id="maxPriceFilter" class="filter-input" placeholder="Max ₺" oninput="applyFiltersAndRender()">
                             
-                            <button class="quick-btn" style="padding: 6px 12px;" onclick="resetFilters()">Temizle</button>
+                            <button class="quick-btn" style="padding: 6px 12px; font-size: 12px;" onclick="resetFilters()">Temizle</button>
                         </div>
                         <div class="filter-row" id="brandTagsRow" style="display:none;">
-                            <span style="font-size: 13px; font-weight:bold; color:var(--text-muted);">Bulunan Markalar:</span>
+                            <span style="font-size: 13px; font-weight:bold; color:var(--text-muted);">Markalar:</span>
                             <div class="brand-tags-container" id="brandTagsContainer"></div>
                         </div>
+                        
+                        <!-- İstatistikler: Min Max üstte, Ortalama Altta -->
                         <div class="stats-dashboard" id="statsDashboard">
-                            <div class="stat-card">
-                                <div class="stat-title">Ortalama Fiyat</div>
-                                <div class="stat-value" id="statAvg">0 ₺</div>
-                            </div>
                             <div class="stat-card">
                                 <div class="stat-title">En Düşük</div>
                                 <div class="stat-value" style="color:var(--success);" id="statMin">0 ₺</div>
@@ -459,6 +470,10 @@
                             <div class="stat-card">
                                 <div class="stat-title">En Yüksek</div>
                                 <div class="stat-value" style="color:var(--danger);" id="statMax">0 ₺</div>
+                            </div>
+                            <div class="stat-card" style="grid-column: 1 / -1;">
+                                <div class="stat-title">Ortalama Fiyat</div>
+                                <div class="stat-value" id="statAvg">0 ₺</div>
                             </div>
                         </div>
                     </div>
@@ -504,7 +519,7 @@
         </div>
 
         <script>
-            // 1. Sağ tık engelleme
+            // 1. Sağ tık engelleme (Sadece Inputlarda İzin Ver)
             document.addEventListener('contextmenu', event => {
                 if(event.target.tagName !== 'INPUT') event.preventDefault();
             });
@@ -829,7 +844,7 @@
                 }
             }
 
-            // Filtreleri Uygulama ve Listeyi Çizme Öncesi Hazırlık
+            // Filtreleri Uygulama ve Listeyi Çizme Öncesi Hazırlık (Live Analytics)
             function applyFiltersAndRender() {
                 let baseData = showFavoritesOnly ? favorites : fetchedData;
                 
@@ -856,7 +871,7 @@
                 applyFiltersAndRender();
             }
 
-            // Analiz İstatistiklerini Hesaplama
+            // Analiz İstatistiklerini Hesaplama (Canlı Güncellenir)
             let cheapestId = null;
             let expensiveId = null;
             function calculateStats() {
@@ -923,11 +938,12 @@
                 else renderList(); // Yıldız durumunu güncelle
             }
 
-            // Swipe Fonksiyonları
+            // Swipe Fonksiyonları (Sağa-Sola Kaydırma, Yazıları Çıkarma)
             function attachSwipeEvents() {
                 document.querySelectorAll('.record-card').forEach(card => {
                     let startX = 0;
                     let currentX = 0;
+                    let wrapper = card.parentElement;
                     
                     card.addEventListener('touchstart', e => {
                         startX = e.touches[0].clientX;
@@ -936,8 +952,13 @@
                     card.addEventListener('touchmove', e => {
                         currentX = e.touches[0].clientX;
                         const diff = currentX - startX;
-                        // Sadece list modunda değilken hafif kaydırma efekti
+                        
+                        // List view modunda kaydırmayı kapa (isteyebiliriz ama karışıklık olmasın diye)
                         if(!document.getElementById('list-container').classList.contains('list-view')) {
+                            // Kaydırma başladıysa arka yazıyı göster
+                            if(Math.abs(diff) > 20) {
+                                wrapper.classList.add('swiping');
+                            }
                             if(Math.abs(diff) < 150) {
                                 card.style.transform = `translateX(${diff}px)`;
                             }
@@ -945,6 +966,7 @@
                     }, {passive: true});
 
                     card.addEventListener('touchend', e => {
+                        wrapper.classList.remove('swiping'); // Yazıyı gizle
                         if(currentX === 0) return;
                         const diff = currentX - startX;
                         card.style.transform = ''; // reset
@@ -962,7 +984,7 @@
                 });
             }
 
-            // Long Press Delete Logic
+            // Long Press Delete Logic (İlerleme Çubuğu Animasyonlu)
             function startDelete(id, btnEl) {
                 actionPlaySound('click');
                 btnEl.classList.add('deleting');
@@ -970,7 +992,7 @@
                     urunSil(id);
                     actionPlaySound('delete');
                     if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                }, 1500); // 1.5 sn
+                }, 1500); // 1.5 sn bar dolumu
             }
             function cancelDelete(btnEl) {
                 clearTimeout(deleteTimer);
@@ -1099,9 +1121,8 @@
                 scoredTargets = scoredTargets.filter(st => st.score > 0).sort((a,b) => b.score - a.score);
 
                 if(scoredTargets.length > 0) {
-                    let htmlList = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:5px;">Tahmini Alternatifler:</div>`;
-                    bodyClassStr = document.body.classList.contains('light-theme') ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)";
-                    htmlList = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:10px; border-bottom:1px solid ${bodyClassStr}; padding-bottom:5px;">Tahmini Alternatifler:</div>`;
+                    let bodyClassStr = document.body.classList.contains('light-theme') ? "rgba(0,0,0,0.1)" : "rgba(255,255,255,0.1)";
+                    let htmlList = `<div style="font-weight:bold; color:var(--text-main); margin-bottom:10px; border-bottom:1px solid ${bodyClassStr}; padding-bottom:5px;">Tahmini Alternatifler:</div>`;
                     
                     const topMatches = scoredTargets.slice(0, 3);
                     
@@ -1159,13 +1180,9 @@
             }
 
             function urunSil(id) {
-                // Sadece globalData'dan sil, favoriyse favorilerden de sil
-                globalData = globalData.filter(u => u.id !== id);
-                if(showFavoritesOnly) {
-                    favorites = favorites.filter(f => f.id !== id);
-                } else {
-                    fetchedData = fetchedData.filter(u => u.id !== id);
-                }
+                // Senkronize olarak her iki arrayden sil
+                fetchedData = fetchedData.filter(u => u.id !== id);
+                favorites = favorites.filter(f => f.id !== id);
                 
                 const wrapper = document.getElementById(`wrapper-${id}`);
                 if(wrapper) {
@@ -1173,7 +1190,7 @@
                     wrapper.style.opacity = "0";
                     setTimeout(() => {
                         wrapper.remove();
-                        applyFiltersAndRender(); // İstatistikleri ve sayacı güncelle
+                        applyFiltersAndRender(); // Animasyon bittikten sonra Canlı İstatistikler + Sayaç güncellenir
                     }, 300);
                 } else {
                     applyFiltersAndRender();
