@@ -800,16 +800,17 @@
                         });
                     }
 
-                    // Aşırı Uç Fiyatları Temizleme
+                    // Aşırı Uç Fiyatları Temizleme (Kamu Solar Asla Silinmez)
                     if(islenmisVeri.length > 3) {
                         const fiyatlar = islenmisVeri.map(v => v.fiyatRaw).sort((a,b) => a-b);
                         const mid = Math.floor(fiyatlar.length / 2);
                         const medyan = fiyatlar.length % 2 !== 0 ? fiyatlar[mid] : (fiyatlar[mid - 1] + fiyatlar[mid]) / 2;
                         
-                        const minFiyat = medyan * 0.25;
-                        const maxFiyat = medyan * 3.0;
+                        const minFiyat = medyan * 0.15; // Alt limit biraz daha esnetildi
+                        const maxFiyat = medyan * 15.0; // Endüstriyel ürünlerdeki büyük farklar için 3'ten 15'e çıkarıldı
 
-                        islenmisVeri = islenmisVeri.filter(v => v.fiyatRaw >= minFiyat && v.fiyatRaw <= maxFiyat);
+                        // isKamu olanlar (Kamu Solar) fiyattan bağımsız olarak ASLA silinmez
+                        islenmisVeri = islenmisVeri.filter(v => v.isKamu || (v.fiyatRaw >= minFiyat && v.fiyatRaw <= maxFiyat));
                     }
 
                     fetchedData = islenmisVeri;
