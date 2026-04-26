@@ -210,7 +210,7 @@
 
             /* Açılır Kapanır Filtre ve Analiz Paneli */
             .advanced-panel {
-                display: none; /* JS ile açılıp kapanacak */
+                display: none; 
                 flex-direction: column;
                 gap: 15px;
                 margin-bottom: 15px;
@@ -281,9 +281,16 @@
                 gap: 20px; padding-bottom: 30px; transition: var(--transition);
             }
 
+            /* Kartları Tutan Ana Taşıyıcı (Rozetlerin kesilmesini engeller) */
+            .card-wrapper-container {
+                position: relative;
+                width: 100%;
+                margin-top: 15px; /* Üstteki rozet için güvenli alan */
+            }
+
             /* Swipe Wrapper (Native Mobil Hissiyat) */
             .swipe-wrapper {
-                position: relative; width: 100%; overflow: hidden; border-radius: 18px; margin-top: 15px; /* Etikete yer açar */
+                position: relative; width: 100%; overflow: hidden; border-radius: 18px; 
             }
             .swipe-bg {
                 position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 18px;
@@ -291,11 +298,10 @@
                 font-family: 'Bangers', cursive; font-size: 16px; letter-spacing: 1.5px;
                 z-index: 1; opacity: 0; transition: opacity 0.2s; pointer-events: none;
             }
-            .swipe-wrapper.swiping .swipe-bg { opacity: 1; } /* Sadece kaydırınca görünür */
-            .swipe-bg .left { color: var(--warning); } /* Favori Rengi */
-            .swipe-bg .right { color: var(--danger); } /* Silme Rengi */
+            .swipe-wrapper.swiping .swipe-bg { opacity: 1; } 
+            .swipe-bg .left { color: var(--warning); } 
+            .swipe-bg .right { color: var(--danger); } 
 
-            /* Kartın Kendisi - Opak yapıldı ki arka plan yazıları sızmasın */
             .record-card {
                 background-color: var(--bg-surface);
                 border-radius: 18px; padding: 20px; border: 1px solid var(--border-solid);
@@ -303,20 +309,19 @@
                 transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
                 cursor: pointer; z-index: 2;
             }
-            /* Renkli Overlay Degrade (Alttaki arka plana sızmaz) */
+
             .record-card.status-kamu { background-image: linear-gradient(180deg, rgba(0, 240, 255, 0.1) 0%, transparent 100%); border-color: rgba(0, 240, 255, 0.6); box-shadow: var(--glow-primary); }
             .record-card.status-google { background-image: linear-gradient(180deg, rgba(251, 188, 5, 0.1) 0%, transparent 100%); border-color: rgba(251, 188, 5, 0.6); box-shadow: 0 0 15px rgba(251, 188, 5, 0.3); }
             .record-card.status-other { background-image: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, transparent 100%); border-color: var(--border-solid); }
             
-            /* Klavye Odağı */
             .record-card.focused { border-color: var(--secondary); box-shadow: var(--glow-secondary); transform: scale(1.02); z-index: 10; }
             .record-card:hover:not(.list-view .record-card) { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,0.6); }
             body.light-theme .record-card:hover:not(.list-view .record-card) { box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
 
-            /* En Ucuz / En Pahalı Rozetleri Özgürleştirildi */
+            /* En Ucuz / En Pahalı Rozetleri Özgürleştirildi (Taşıyıcı içinde mutlak konumlu) */
             .price-badge {
                 position: absolute; top: -14px; left: 15px; font-size: 10px; padding: 4px 10px; border-radius: 10px;
-                text-transform: uppercase; letter-spacing: 1px; z-index: 5; box-shadow: 0 2px 10px rgba(0,0,0,0.5); font-family: 'Bangers', cursive; letter-spacing: 1.5px;
+                text-transform: uppercase; letter-spacing: 1px; z-index: 10; box-shadow: 0 2px 10px rgba(0,0,0,0.5); font-family: 'Bangers', cursive; letter-spacing: 1.5px;
             }
             .badge-ucuz { background: var(--success); color: #000; border: 1px solid #fff; }
             .badge-pahali { background: var(--danger); color: #fff; border: 1px solid #fff; }
@@ -373,7 +378,7 @@
 
             /* --- Mükemmel List/Excel Görünümü (Tüm Ekranlar için Kompakt) --- */
             .list-container.list-view { grid-template-columns: 1fr; gap: 10px; }
-            .list-container.list-view .swipe-wrapper { margin-top: 8px; }
+            .list-container.list-view .card-wrapper-container { margin-top: 8px; }
             .list-container.list-view .record-card { flex-direction: row; flex-wrap: wrap; align-items: center; padding: 10px; gap: 10px; }
             .list-container.list-view .card-header { min-width: auto; flex-shrink: 0; margin: 0; }
             .list-container.list-view .store-badge { font-size: 10px; padding: 4px 8px; }
@@ -383,7 +388,7 @@
             .list-container.list-view .btn-group { display: flex; flex-direction: row; gap: 5px; padding: 0; margin: 0; }
             .list-container.list-view .card-btn { padding: 6px 12px; font-size: 11px; }
             .list-container.list-view .checkbox-wrapper { position: static; margin-right: 5px; }
-            .list-container.list-view .price-badge { top: 0; left: 0; position: static; margin-right: 5px; font-size: 9px; padding: 3px 6px; display: inline-block; }
+            .list-container.list-view .price-badge { top: -10px; left: 5px; font-size: 9px; padding: 3px 6px; }
 
             @media (max-width: 768px) {
                 .search-container { flex-direction: column; }
@@ -403,7 +408,6 @@
         </style>
     </head>
     <body onclick="initFullscreen()">
-        <!-- Paralaks Arka Plan -->
         <div id="parallax-bg"></div>
 
         <div class="app-wrapper">
@@ -449,11 +453,9 @@
 
                     <div class="advanced-panel" id="advancedPanel">
                         <div class="filter-row">
-                            <!-- Label kaldırıldı, Temizle butonu daraltıldı, Inputlara tam esneklik verildi -->
                             <input type="number" id="minPriceFilter" class="filter-input" placeholder="Min ₺" oninput="applyFiltersAndRender()">
                             <span style="color:var(--text-muted); font-weight:bold;">-</span>
                             <input type="number" id="maxPriceFilter" class="filter-input" placeholder="Max ₺" oninput="applyFiltersAndRender()">
-                            
                             <button class="quick-btn" style="padding: 6px 12px; font-size: 12px;" onclick="resetFilters()">Temizle</button>
                         </div>
                         <div class="filter-row" id="brandTagsRow" style="display:none;">
@@ -461,7 +463,6 @@
                             <div class="brand-tags-container" id="brandTagsContainer"></div>
                         </div>
                         
-                        <!-- İstatistikler: Min Max üstte, Ortalama Altta -->
                         <div class="stats-dashboard" id="statsDashboard">
                             <div class="stat-card">
                                 <div class="stat-title">En Düşük</div>
@@ -519,12 +520,10 @@
         </div>
 
         <script>
-            // 1. Sağ tık engelleme (Sadece Inputlarda İzin Ver)
             document.addEventListener('contextmenu', event => {
                 if(event.target.tagName !== 'INPUT') event.preventDefault();
             });
 
-            // 2. Sentetik Siber Ses & Titreşim Motoru
             const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             function actionPlaySound(type = 'click') {
                 if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -554,7 +553,6 @@
                 } catch (e) {}
             }
 
-            // 3. Otomatik Tam Ekran
             let isFullscreen = false;
             function initFullscreen() {
                 if (!isFullscreen) {
@@ -564,7 +562,6 @@
                 }
             }
 
-            // KAMUSOLAR / KARAARSLAN Animasyonu
             setInterval(() => {
                 const dt = document.getElementById('dynamicText');
                 dt.style.opacity = '0';
@@ -574,7 +571,6 @@
                 }, 500);
             }, 3000);
 
-            // Matematiksel Fiyat Çözücü
             function parsePrice(priceStr) {
                 if (!priceStr) return 0;
                 let parts = priceStr.split(/[\s\n]+/);
@@ -621,7 +617,6 @@
                 "voltronics", "voole", "weg", "yilsolar", "zmr"
             ]);
 
-            // YENİ STATE DEĞİŞKENLERİ
             let fetchedData = []; 
             let globalData = [];
             let favorites = [];
@@ -630,10 +625,8 @@
             let activeCardIndex = -1;
             let deleteTimer = null;
 
-            // PC için tasarımcı textini sadece geniş ekranda göster
             if(window.innerWidth > 768) document.getElementById('desktopDesigner').style.display = 'block';
 
-            // Parallax Arka Plan Efekti
             document.addEventListener('mousemove', (e) => {
                 const bg = document.getElementById('parallax-bg');
                 const x = (window.innerWidth / 2 - e.pageX) / 40;
@@ -641,7 +634,6 @@
                 bg.style.transform = `translate(${x}px, ${y}px)`;
             });
 
-            // Tema Değiştirme
             function toggleTheme() {
                 actionPlaySound();
                 document.body.classList.toggle('light-theme');
@@ -658,7 +650,6 @@
                 }
             }
 
-            // View Modu Değiştirme
             function toggleView() {
                 actionPlaySound();
                 const container = document.getElementById('list-container');
@@ -673,7 +664,6 @@
                 }
             }
 
-            // Ekstra Seçenekler Paneli Toggle
             function toggleExtraOptions() {
                 actionPlaySound();
                 const panel = document.getElementById('advancedPanel');
@@ -687,11 +677,10 @@
                 }
             }
 
-            // Klavye Kısayolları (Focus, Enter, Esc, Space)
             window.addEventListener('keydown', (e) => {
                 if(e.target.tagName === 'INPUT') {
                     if(e.key === 'Escape') e.target.blur();
-                    return; // Inputtayken yön tuşları vs çalışmasın
+                    return; 
                 }
                 
                 const cards = document.querySelectorAll('.record-card');
@@ -718,7 +707,7 @@
                         openDiffs.forEach(d => d.classList.remove('show'));
                         actionPlaySound();
                     } else {
-                        toggleView(); // Kapatacak bir şey yoksa view toggle yap (ekstra pratik)
+                        toggleView(); 
                     }
                 }
             });
@@ -732,53 +721,86 @@
                 }
             }
 
-            // ARAMA FONKSİYONU
+            // ÇİFT MOTORLU (DUAL) ARAMA VE YAPAY ZEKA FİLTRESİ
             async function ara() {
                 actionPlaySound();
-                initFullscreen(); // Arama başladığında tam ekran yap
+                initFullscreen(); 
                 
                 const query = document.getElementById('searchInput').value.trim();
-                document.getElementById('searchInput').blur(); // Klavyeyi kapat
+                document.getElementById('searchInput').blur(); 
                 if(!query && !showFavoritesOnly) return;
 
                 document.getElementById('list-container').innerHTML = '';
                 document.getElementById('actionPanel').style.display = 'none';
                 document.getElementById('loader').style.display = 'flex';
                 document.getElementById('selectAll').checked = false;
-                showFavoritesOnly = false; // Yeni arama yapınca favori modundan çık
+                showFavoritesOnly = false; 
                 document.getElementById('favToggleBtn').classList.remove('active');
-                selectedBrand = null; // Marka filtresini sıfırla
+                selectedBrand = null; 
 
                 try {
-                    const response = await fetch(`/ara?q=${encodeURIComponent(query)}`);
-                    let veriler = await response.json();
-                    
-                    let islenmisVeri = veriler.map((v, index) => ({
-                        id: Date.now() + index, // Benzersiz ID
-                        magaza: v.magaza,
-                        urunAdi: v.urunAdi,
-                        fiyatRaw: parsePrice(v.fiyat),
-                        link: v.link,
-                        isKamu: v.magaza.toLowerCase().includes('kamu solar'),
-                        isGoogle: v.isGoogle || false
-                    })).filter(v => v.fiyatRaw > 0);
-
-                    // Marka temizleme kuralı devrede
                     let aramaKelimeleri = query.toLowerCase().split(/\s+/).filter(k => k.length > 1);
+                    let temizKelimeler = aramaKelimeleri.filter(k => !markalar.has(k));
                     
-                    if(aramaKelimeleri.length > 0) {
-                        let temizKelimeler = aramaKelimeleri.filter(k => !markalar.has(k));
-                        let finalKelimeler = temizKelimeler.length > 0 ? temizKelimeler : aramaKelimeleri;
+                    let queriesToRun = [query];
+                    // Eğer marka tespit edildiyse, markasız halini de paralel olarak aratıyoruz (Kapsamı genişletmek için)
+                    if (temizKelimeler.length > 0 && temizKelimeler.length < aramaKelimeleri.length) {
+                        queriesToRun.push(temizKelimeler.join(' '));
+                    }
 
+                    // Arama isteklerini paralel fırlat
+                    const fetchPromises = queriesToRun.map(q => fetch(`/ara?q=${encodeURIComponent(q)}`).then(r => r.json()));
+                    const responses = await Promise.all(fetchPromises);
+                    
+                    let allResults = [];
+                    responses.forEach(res => { allResults = allResults.concat(res); });
+
+                    // Gelen sonuçlarda aynı linke sahip ürünleri birleştir (Tekilleştirme)
+                    const uniqueLinks = new Set();
+                    let islenmisVeri = [];
+                    
+                    allResults.forEach((v, index) => {
+                        if (!uniqueLinks.has(v.link)) {
+                            uniqueLinks.add(v.link);
+                            let fiyatP = parsePrice(v.fiyat);
+                            if (fiyatP > 0) {
+                                islenmisVeri.push({
+                                    id: Date.now() + index, // Benzersiz ID
+                                    magaza: v.magaza,
+                                    urunAdi: v.urunAdi,
+                                    fiyatRaw: fiyatP,
+                                    link: v.link,
+                                    isKamu: v.magaza.toLowerCase().includes('kamu solar'),
+                                    isGoogle: v.isGoogle || false
+                                });
+                            }
+                        }
+                    });
+
+                    // Ön Yüz AI Filtrelemesi (%50 Esneklikli)
+                    if(aramaKelimeleri.length > 0) {
                         islenmisVeri = islenmisVeri.filter(v => {
                             const baslik = v.urunAdi.toLowerCase();
-                            let eslesenKelimeSayisi = 0;
-                            finalKelimeler.forEach(kelime => { if(baslik.includes(kelime)) eslesenKelimeSayisi++; });
-                            const uyumOrani = eslesenKelimeSayisi / finalKelimeler.length;
-                            return uyumOrani >= 0.6; 
+                            
+                            // Senaryo 1: Tam arama cümleleriyle eşleşme orantısı
+                            let eslesen1 = 0;
+                            aramaKelimeleri.forEach(k => { if(baslik.includes(k)) eslesen1++; });
+                            const oran1 = eslesen1 / aramaKelimeleri.length;
+
+                            // Senaryo 2: Temiz (markasız) kelimelerle eşleşme orantısı
+                            let oran2 = 0;
+                            if(temizKelimeler.length > 0) {
+                                let eslesen2 = 0;
+                                temizKelimeler.forEach(k => { if(baslik.includes(k)) eslesen2++; });
+                                oran2 = eslesen2 / temizKelimeler.length;
+                            }
+
+                            // Herhangi bir senaryoda %50 uyum bulursan onay ver. (Eskiden 0.60 idi, şimdi daha hassas)
+                            return oran1 >= 0.50 || oran2 >= 0.50;
                         });
                     }
 
+                    // Aşırı Uç Fiyatları Temizleme
                     if(islenmisVeri.length > 3) {
                         const fiyatlar = islenmisVeri.map(v => v.fiyatRaw).sort((a,b) => a-b);
                         const mid = Math.floor(fiyatlar.length / 2);
@@ -807,7 +829,6 @@
                 }
             }
 
-            // Markaları Çıkarma ve Etiketleri Oluşturma
             function extractBrands(dataList) {
                 const foundBrands = new Set();
                 dataList.forEach(u => {
@@ -844,7 +865,6 @@
                 }
             }
 
-            // Filtreleri Uygulama ve Listeyi Çizme Öncesi Hazırlık (Live Analytics)
             function applyFiltersAndRender() {
                 let baseData = showFavoritesOnly ? favorites : fetchedData;
                 
@@ -860,7 +880,7 @@
                 });
 
                 calculateStats();
-                siralamaDegistir(); // İçinden renderList çağrılır
+                siralamaDegistir(); 
             }
 
             function resetFilters() {
@@ -871,7 +891,6 @@
                 applyFiltersAndRender();
             }
 
-            // Analiz İstatistiklerini Hesaplama (Canlı Güncellenir)
             let cheapestId = null;
             let expensiveId = null;
             function calculateStats() {
@@ -908,14 +927,13 @@
                 renderList();
             }
 
-            // Favori Görünümüne Geçiş
             function toggleFavoritesView() {
                 actionPlaySound();
                 showFavoritesOnly = !showFavoritesOnly;
                 const btn = document.getElementById('favToggleBtn');
                 if(showFavoritesOnly) {
                     btn.classList.add('active');
-                    document.getElementById('searchInput').value = ''; // Arama kutusunu temizle
+                    document.getElementById('searchInput').value = ''; 
                 } else {
                     btn.classList.remove('active');
                 }
@@ -935,10 +953,9 @@
                     favorites.push(urun);
                 }
                 if(showFavoritesOnly) applyFiltersAndRender();
-                else renderList(); // Yıldız durumunu güncelle
+                else renderList(); 
             }
 
-            // Swipe Fonksiyonları (Sağa-Sola Kaydırma, Yazıları Çıkarma)
             function attachSwipeEvents() {
                 document.querySelectorAll('.record-card').forEach(card => {
                     let startX = 0;
@@ -953,9 +970,7 @@
                         currentX = e.touches[0].clientX;
                         const diff = currentX - startX;
                         
-                        // List view modunda kaydırmayı kapa (isteyebiliriz ama karışıklık olmasın diye)
                         if(!document.getElementById('list-container').classList.contains('list-view')) {
-                            // Kaydırma başladıysa arka yazıyı göster
                             if(Math.abs(diff) > 20) {
                                 wrapper.classList.add('swiping');
                             }
@@ -966,16 +981,16 @@
                     }, {passive: true});
 
                     card.addEventListener('touchend', e => {
-                        wrapper.classList.remove('swiping'); // Yazıyı gizle
+                        wrapper.classList.remove('swiping'); 
                         if(currentX === 0) return;
                         const diff = currentX - startX;
-                        card.style.transform = ''; // reset
+                        card.style.transform = ''; 
                         
                         const id = parseInt(card.id.split('-')[1]);
-                        if(diff > 80) { // Sağa kaydır -> Favori
+                        if(diff > 80) { 
                             toggleFavorite(id);
                             if(navigator.vibrate) navigator.vibrate([50,50]);
-                        } else if (diff < -80) { // Sola kaydır -> Sil
+                        } else if (diff < -80) { 
                             urunSil(id);
                             if(navigator.vibrate) navigator.vibrate([100]);
                         }
@@ -984,7 +999,6 @@
                 });
             }
 
-            // Long Press Delete Logic (İlerleme Çubuğu Animasyonlu)
             function startDelete(id, btnEl) {
                 actionPlaySound('click');
                 btnEl.classList.add('deleting');
@@ -992,7 +1006,7 @@
                     urunSil(id);
                     actionPlaySound('delete');
                     if(navigator.vibrate) navigator.vibrate([100, 50, 100]);
-                }, 1500); // 1.5 sn bar dolumu
+                }, 1500); 
             }
             function cancelDelete(btnEl) {
                 clearTimeout(deleteTimer);
@@ -1002,7 +1016,7 @@
             function renderList() {
                 const container = document.getElementById('list-container');
                 let html = '';
-                activeCardIndex = -1; // Reset keyboard focus
+                activeCardIndex = -1; 
 
                 if(globalData.length > 0) {
                     document.getElementById('actionPanel').style.display = 'flex';
@@ -1026,36 +1040,38 @@
                         if(urun.id === expensiveId) priceBadge = `<div class="price-badge badge-pahali"><i class="ph ph-trend-up"></i> EN PAHALI</div>`;
                     }
 
-                    // Swipe Background Wrapper
+                    // YENİ YAPI: En dıştaki div Overflow kısıtlamasına sahip DEĞİL. Bu sayede rozetler kesilmeden havada duruyor.
                     html += `
-                    <div class="swipe-wrapper" id="wrapper-${urun.id}">
-                        <div class="swipe-bg">
-                            <span class="left"><i class="ph ph-star"></i> FAVORİ</span>
-                            <span class="right"><i class="ph ph-trash"></i> SİL</span>
-                        </div>
-                        <div class="record-card ${statusClass}" id="card-${urun.id}" onclick="kiyasla(${urun.id})">
-                            ${priceBadge}
-                            ${favIconHTML}
-                            <div class="checkbox-wrapper" onclick="event.stopPropagation()">
-                                <input type="checkbox" class="urun-secim" value="${urun.id}" onclick="actionPlaySound(); updateSelectAllState()">
+                    <div class="card-wrapper-container" id="wrapper-container-${urun.id}">
+                        ${priceBadge}
+                        <div class="swipe-wrapper" id="wrapper-${urun.id}">
+                            <div class="swipe-bg">
+                                <span class="left"><i class="ph ph-star"></i> FAVORİ</span>
+                                <span class="right"><i class="ph ph-trash"></i> SİL</span>
                             </div>
-                            <div class="card-header">
-                                <div class="store-badge" style="background-color: ${badgeBg}; color: ${badgeText}; border-color: ${badgeColor};">
-                                    ${kamuBadge} ${urun.magaza}
+                            <div class="record-card ${statusClass}" id="card-${urun.id}" onclick="kiyasla(${urun.id})">
+                                ${favIconHTML}
+                                <div class="checkbox-wrapper" onclick="event.stopPropagation()">
+                                    <input type="checkbox" class="urun-secim" value="${urun.id}" onclick="actionPlaySound(); updateSelectAllState()">
                                 </div>
-                            </div>
-                            <div class="product-name selectable">${urun.urunAdi}</div>
-                            <div class="price-area">
-                                <div class="amt-paid font-kite">${formatMoney(urun.fiyatRaw)} ₺</div>
-                            </div>
-                            <div id="diff-${urun.id}" class="diff-container"></div>
-                            <div class="btn-group" onclick="event.stopPropagation()">
-                                <button class="card-btn btn-buy" onclick="actionPlaySound(); window.open('${urun.link}', '_blank')">GİT</button>
-                                <button class="card-btn btn-save" onclick="linkKopyala('${urun.link}')">KAYDET</button>
-                                <button class="card-btn btn-delete" 
-                                        onmousedown="startDelete(${urun.id}, this)" onmouseup="cancelDelete(this)" onmouseleave="cancelDelete(this)"
-                                        ontouchstart="startDelete(${urun.id}, this)" ontouchend="cancelDelete(this)" ontouchcancel="cancelDelete(this)"
-                                        title="Silmek için basılı tutun">SİL</button>
+                                <div class="card-header">
+                                    <div class="store-badge" style="background-color: ${badgeBg}; color: ${badgeText}; border-color: ${badgeColor};">
+                                        ${kamuBadge} ${urun.magaza}
+                                    </div>
+                                </div>
+                                <div class="product-name selectable">${urun.urunAdi}</div>
+                                <div class="price-area">
+                                    <div class="amt-paid font-kite">${formatMoney(urun.fiyatRaw)} ₺</div>
+                                </div>
+                                <div id="diff-${urun.id}" class="diff-container"></div>
+                                <div class="btn-group" onclick="event.stopPropagation()">
+                                    <button class="card-btn btn-buy" onclick="actionPlaySound(); window.open('${urun.link}', '_blank')">GİT</button>
+                                    <button class="card-btn btn-save" onclick="linkKopyala('${urun.link}')">KAYDET</button>
+                                    <button class="card-btn btn-delete" 
+                                            onmousedown="startDelete(${urun.id}, this)" onmouseup="cancelDelete(this)" onmouseleave="cancelDelete(this)"
+                                            ontouchstart="startDelete(${urun.id}, this)" ontouchend="cancelDelete(this)" ontouchcancel="cancelDelete(this)"
+                                            title="Silmek için basılı tutun">SİL</button>
+                                </div>
                             </div>
                         </div>
                     </div>`;
@@ -1069,7 +1085,6 @@
                 document.getElementById('resultCountText').innerText = `${globalData.length} Ürün`;
                 updateSelectAllState();
                 
-                // Render sonrası swipe eventlerini ekle
                 attachSwipeEvents();
             }
 
@@ -1107,7 +1122,6 @@
                     return;
                 }
 
-                // Ekranda favoriler modundaysak sadece favoriler arasında kıyasla, değilse aramada
                 let mevcutListe = showFavoritesOnly ? favorites : fetchedData; 
                 
                 const hedefler = urun.isKamu ? mevcutListe.filter(u => !u.isKamu) : mevcutListe.filter(u => u.isKamu);
@@ -1180,17 +1194,17 @@
             }
 
             function urunSil(id) {
-                // Senkronize olarak her iki arrayden sil
                 fetchedData = fetchedData.filter(u => u.id !== id);
                 favorites = favorites.filter(f => f.id !== id);
                 
-                const wrapper = document.getElementById(`wrapper-${id}`);
-                if(wrapper) {
-                    wrapper.style.transform = "scale(0)";
-                    wrapper.style.opacity = "0";
+                // Animasyonlu silme ve istatistik güncelleme
+                const wrapperContainer = document.getElementById(`wrapper-container-${id}`);
+                if(wrapperContainer) {
+                    wrapperContainer.style.transform = "scale(0)";
+                    wrapperContainer.style.opacity = "0";
                     setTimeout(() => {
-                        wrapper.remove();
-                        applyFiltersAndRender(); // Animasyon bittikten sonra Canlı İstatistikler + Sayaç güncellenir
+                        wrapperContainer.remove();
+                        applyFiltersAndRender(); 
                     }, 300);
                 } else {
                     applyFiltersAndRender();
